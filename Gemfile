@@ -76,3 +76,9 @@ group :test do
   gem "capybara"
   gem "selenium-webdriver"
 end
+
+# Heroku deployment requirements
+group :production do
+  # Heroku asset compilation
+  gem 'rails_serve_static_assets'
+end

@@ -79,6 +79,4 @@ test:
 #
 production:
   <<: *default
-  database: backerkit_clone_production
-  username: backerkit_clone
-  password: <%= ENV["BACKERKIT_CLONE_DATABASE_PASSWORD"] %>
+  url: <%= ENV['DATABASE_URL'] %>
