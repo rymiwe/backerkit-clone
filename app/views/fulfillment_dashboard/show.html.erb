@@ -1,0 +1,287 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8 flex justify-between items-center">
+    <div>
+      <h1 class="text-3xl font-bold mb-2">Fulfillment Dashboard</h1>
+      <p class="text-gray-600">Manage reward fulfillment for <%= @project.title %></p>
+    </div>
+    <div>
+      <%= link_to "Back to Project", project_path(@project), class: "px-4 py-2 bg-gray-100 rounded-md text-gray-800 hover:bg-gray-200" %>
+    </div>
+  </div>
+  
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Project Overview</h2>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <p class="text-sm text-gray-500 mb-1">Total Backers</p>
+        <p class="text-2xl font-bold"><%= @project.pledges.count %></p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <p class="text-sm text-gray-500 mb-1">Total Rewards</p>
+        <p class="text-2xl font-bold"><%= @rewards.count %></p>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-lg">
+        <p class="text-sm text-gray-500 mb-1">Overall Fulfillment Progress</p>
+        <% overall_progress = @rewards.any? ? @rewards.sum(&:fulfillment_progress) / @rewards.count : 0 %>
+        <div class="flex items-center">
+          <p class="text-2xl font-bold mr-3"><%= overall_progress %>%</p>
+          <div class="flex-grow h-2 bg-gray-200 rounded-full overflow-hidden">
+            <div class="h-full bg-indigo-600 rounded-full" style="width: <%= overall_progress %>%"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Production Priorities Section -->
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 class="text-xl font-semibold mb-4">Production Priorities</h2>
+    
+    <% priority_items = @project.rewards.flat_map(&:reward_items)
+                             .select { |item| item.produced_count < item.total_needed }
+                             .sort_by { |item| item.production_percentage }
+                             .first(5) %>
+    
+    <% if priority_items.any? %>
+      <div class="space-y-4">
+        <% priority_items.each do |item| %>
+          <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+            <div>
+              <div class="font-medium"><%= item.name %></div>
+              <div class="text-sm text-gray-500">
+                <%= item.reward.title %> - <%= item.produced_count %> of <%= item.total_needed %> produced
+              </div>
+            </div>
+            <div class="w-1/3">
+              <div class="flex items-center">
+                <span class="text-sm font-medium mr-2"><%= item.production_percentage %>%</span>
+                <div class="w-full bg-gray-200 h-2 rounded-full">
+                  <div class="bg-blue-500 h-2 rounded-full" 
+                       style="width: <%= item.production_percentage %>%"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <p class="text-gray-500 py-4 text-center">All items are in production or ready for fulfillment!</p>
+    <% end %>
+  </div>
+  
+  <div class="grid grid-cols-1 gap-6 mb-8">
+    <% @rewards.each do |reward| %>
+      <div class="bg-white rounded-lg shadow-md p-6">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <!-- Reward Info -->
+          <div class="md:col-span-2">
+            <div class="flex justify-between mb-2">
+              <h3 class="text-xl font-bold"><%= number_to_currency(reward.amount) %></h3>
+              <span class="text-sm bg-gray-100 px-2 py-1 rounded-full"><%= reward.pledges.count %> backers</span>
+            </div>
+            <h4 class="text-lg font-medium text-gray-900 mb-2"><%= reward.title %></h4>
+            <p class="text-gray-700 mb-4"><%= reward.description %></p>
+          </div>
+          
+          <!-- Status Info -->
+          <div class="bg-gray-50 p-4 rounded-lg">
+            <div class="flex flex-col h-full justify-between">
+              <div>
+                <div class="mb-4">
+                  <p class="text-sm text-gray-500 font-medium mb-1">Status</p>
+                  <%= render Ui::FulfillmentStatusComponent.new(status: reward.status || "not_started") %>
+                </div>
+                
+                <div class="mb-4">
+                  <p class="text-sm text-gray-500 font-medium mb-1">Delivery Estimate</p>
+                  <p class="text-sm font-medium"><%= reward.estimated_delivery ? reward.estimated_delivery.strftime("%B %Y") : "Not specified" %></p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Item-level tracking -->
+        <div class="mt-6 border-t pt-4">
+          <div class="flex justify-between items-center mb-4">
+            <h3 class="text-lg font-medium">Item Production Tracking</h3>
+            <button data-controller="modal" data-action="modal#open" data-modal-target="add-item-<%= reward.id %>" 
+                    class="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+              Add Item
+            </button>
+          </div>
+          
+          <% if reward.reward_items.exists? %>
+            <div class="overflow-x-auto">
+              <table class="w-full">
+                <thead>
+                  <tr class="bg-gray-50">
+                    <th class="px-4 py-2 text-left">Item</th>
+                    <th class="px-4 py-2 text-center">Needed</th>
+                    <th class="px-4 py-2 text-center">Produced</th>
+                    <th class="px-4 py-2 text-center">Shipped</th>
+                    <th class="px-4 py-2 text-center">Status</th>
+                    <th class="px-4 py-2 text-right">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% reward.reward_items.each do |item| %>
+                    <tr class="border-b">
+                      <td class="px-4 py-3">
+                        <div class="font-medium"><%= item.name %></div>
+                        <div class="text-xs text-gray-500"><%= item.quantity_per_reward %> per backer</div>
+                      </td>
+                      <td class="px-4 py-3 text-center"><%= item.total_needed %></td>
+                      <td class="px-4 py-3 text-center">
+                        <%= item.produced_count %>
+                        <div class="w-full bg-gray-200 h-1 mt-1">
+                          <div class="bg-blue-500 h-1" style="width: <%= item.production_percentage %>%"></div>
+                        </div>
+                      </td>
+                      <td class="px-4 py-3 text-center">
+                        <%= item.shipped_count %>
+                        <div class="w-full bg-gray-200 h-1 mt-1">
+                          <div class="bg-green-500 h-1" style="width: <%= item.shipping_percentage %>%"></div>
+                        </div>
+                      </td>
+                      <td class="px-4 py-3 text-center">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= item.status_badge_class %>">
+                          <%= item.status_name %>
+                        </span>
+                      </td>
+                      <td class="px-4 py-3 text-right">
+                        <div class="flex justify-end space-x-2">
+                          <button data-controller="modal" data-action="modal#open" 
+                                  data-modal-target="update-item-<%= item.id %>"
+                                  class="text-sm text-indigo-600 hover:text-indigo-800">
+                            Update
+                          </button>
+                          <%= button_to "Delete", 
+                                        project_reward_reward_item_path(@project, reward, item), 
+                                        method: :delete, 
+                                        class: "text-sm text-red-600 hover:text-red-800",
+                                        form: { data: { turbo_confirm: "Are you sure? This cannot be undone." } } %>
+                        </div>
+                      </td>
+                    </tr>
+                    
+                    <!-- Update Item Modal -->
+                    <div id="update-item-<%= item.id %>" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" data-modal-target="modal">
+                      <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+                        <div class="flex justify-between items-center mb-4">
+                          <h3 class="text-lg font-medium">Update <%= item.name %></h3>
+                          <button data-action="modal#close" class="text-gray-400 hover:text-gray-500">
+                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        
+                        <%= form_with url: project_fulfillment_dashboard_update_item_counts_path(@project), method: :patch do |f| %>
+                          <%= f.hidden_field :reward_id, value: reward.id %>
+                          <%= f.hidden_field :item_id, value: item.id %>
+                          
+                          <div class="space-y-4">
+                            <div>
+                              <label class="block text-sm font-medium text-gray-700 mb-1">Produced Count</label>
+                              <%= f.number_field 'reward_item[produced_count]', value: item.produced_count, min: 0, max: [item.total_needed * 2, 10000].min, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+                              <p class="text-xs text-gray-500 mt-1">Total needed: <%= item.total_needed %></p>
+                            </div>
+                            
+                            <div>
+                              <label class="block text-sm font-medium text-gray-700 mb-1">Shipped Count</label>
+                              <%= f.number_field 'reward_item[shipped_count]', value: item.shipped_count, min: 0, max: item.produced_count, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+                              <p class="text-xs text-gray-500 mt-1">Cannot exceed produced count</p>
+                            </div>
+                            
+                            <div class="flex justify-end">
+                              <button type="button" data-action="modal#close" class="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md mr-2 hover:bg-gray-200">
+                                Cancel
+                              </button>
+                              <%= f.submit "Update Counts", class: "px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700" %>
+                            </div>
+                          </div>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% end %>
+                </tbody>
+              </table>
+              
+              <div class="mt-4 flex justify-between items-center">
+                <div>
+                  <span class="text-sm font-medium">Fulfillable Backers:</span>
+                  <span class="ml-1 text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
+                    <%= reward.fulfillable_backer_count %> of <%= reward.pledges.count %>
+                  </span>
+                </div>
+              </div>
+            </div>
+          <% else %>
+            <div class="text-center py-8 bg-gray-50 rounded-lg">
+              <p class="text-gray-500 mb-2">No items added yet</p>
+              <p class="text-sm text-gray-400">Add items to track production and shipping status</p>
+            </div>
+          <% end %>
+          
+          <!-- Add Item Modal -->
+          <div id="add-item-<%= reward.id %>" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" data-modal-target="modal">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+              <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-medium">Add New Item</h3>
+                <button data-action="modal#close" class="text-gray-400 hover:text-gray-500">
+                  <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+              
+              <%= form_with url: project_reward_reward_items_path(@project, reward), method: :post do |f| %>
+                <div class="space-y-4">
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
+                    <%= f.text_field 'reward_item[name]', required: true, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                    <%= f.text_area 'reward_item[description]', rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Quantity Per Reward</label>
+                    <%= f.number_field 'reward_item[quantity_per_reward]', value: 1, min: 1, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+                    <p class="text-xs text-gray-500 mt-1">How many of this item each backer receives</p>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Produced Count</label>
+                    <%= f.number_field 'reward_item[produced_count]', value: 0, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+                  </div>
+                  
+                  <div>
+                    <label class="block text-sm font-medium text-gray-700 mb-1">Shipped Count</label>
+                    <%= f.number_field 'reward_item[shipped_count]', value: 0, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
+                  </div>
+                  
+                  <div class="flex justify-end">
+                    <button type="button" data-action="modal#close" class="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md mr-2 hover:bg-gray-200">
+                      Cancel
+                    </button>
+                    <%= f.submit "Add Item", class: "px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700" %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Slider for this reward -->
+        <%= render Ui::ProgressSliderComponent.new(reward: reward, project: @project) %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -1,0 +1,35 @@
+<div data-controller="slider" 
+     data-slider-project-value="<%= project.id %>"
+     data-slider-reward-value="<%= reward.id %>"
+     data-slider-status-value="<%= reward.status.to_s.gsub('_', '-') %>"
+     class="mt-6 px-2">
+  
+  <%= form_with url: form_url, method: :patch, class: "mt-2" do |form| %>
+    <%= form.hidden_field :reward_id, value: reward.id %>
+    
+    <div class="flex justify-between mb-1">
+      <span class="text-sm font-medium text-gray-700">Fulfillment Progress</span>
+      <span class="text-sm font-medium text-gray-700" data-slider-target="valueDisplay"><%= current_value %>%</span>
+    </div>
+    
+    <div class="relative mb-4 slider-with-fill <%= reward.status.to_s.gsub('_', '-') %>" 
+         style="--fill-percentage: <%= current_value %>%"
+         data-slider-target="sliderContainer">
+      <%= form.range_field "reward[fulfillment_progress]", 
+                          min: 0, 
+                          max: 100, 
+                          value: current_value,
+                          class: "w-full z-10 relative",
+                          data: { 
+                            action: "input->slider#updateProgress",
+                            slider_target: "input"
+                          } %>
+    </div>
+    
+    <div class="flex justify-center mt-4">
+      <%= form.submit "Save Progress", 
+                    data: { slider_target: "saveButton" },
+                    class: "px-6 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:pointer-events-none" %>
+    </div>
+  <% end %>
+</div>

@@ -1,0 +1,18 @@
+<div class="max-w-3xl mx-auto px-4 py-8">
+  <div class="bg-white shadow-md rounded-lg overflow-hidden p-6">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-2xl font-bold text-gray-900">Edit Reward</h1>
+      <%= link_to "← Back to Project", project_path(@project), class: "text-indigo-600 hover:text-indigo-800" %>
+    </div>
+    
+    <%= render 'form', reward: @reward %>
+    
+    <div class="mt-6 pt-6 border-t border-gray-200">
+      <div class="flex justify-end">
+        <%= button_to "Delete Reward", project_reward_path(@project, @reward), method: :delete, 
+            data: { confirm: "Are you sure you want to delete this reward? This action cannot be undone." }, 
+            class: "text-red-600 hover:text-red-800 font-medium" %>
+      </div>
+    </div>
+  </div>
+</div>

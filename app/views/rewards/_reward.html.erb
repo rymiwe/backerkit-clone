@@ -1,0 +1,25 @@
+<div class="bg-white rounded-lg border border-gray-200 shadow-sm hover:shadow-md transition-shadow duration-300">
+  <div class="p-5">
+    <div class="flex justify-between items-center mb-3">
+      <h3 class="text-xl font-bold text-gray-900"><%= number_to_currency(reward.amount) %></h3>
+      <% if reward.estimated_delivery %>
+        <span class="text-xs text-gray-500">Est. delivery: <%= reward.estimated_delivery.strftime("%b %Y") %></span>
+      <% end %>
+    </div>
+    
+    <h4 class="text-lg font-medium text-gray-800 mb-2"><%= reward.title %></h4>
+    <p class="text-gray-600 mb-4"><%= reward.description %></p>
+    
+    <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+      <% if current_user && current_user == @project.creator %>
+        <div class="flex space-x-2">
+          <%= link_to "Edit", edit_project_reward_path(@project, reward), class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+        </div>
+      <% end %>
+      
+      <% if current_user && current_user != @project.creator %>
+        <%= link_to "Back this reward", new_project_pledge_path(@project, reward_id: reward.id), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      <% end %>
+    </div>
+  </div>
+</div>

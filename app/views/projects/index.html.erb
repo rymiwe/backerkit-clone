@@ -1,0 +1,50 @@
+<div class="max-w-7xl mx-auto px-4 py-12 sm:px-6 lg:px-8">
+  <div class="flex justify-between items-center mb-12">
+    <div>
+      <h1 class="text-4xl font-extrabold text-gray-900">Discover Projects</h1>
+      <p class="mt-3 text-lg text-gray-600">Find and support creative projects that inspire you</p>
+    </div>
+    <% if current_user&.is_a?(Creator) %>
+      <%= link_to "Create New Project", new_project_path, class: "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+    <% end %>
+  </div>
+
+  <!-- Category Filter -->
+  <div class="mb-8">
+    <h2 class="text-xl font-semibold mb-4">Browse by Category</h2>
+    <div class="flex flex-wrap gap-2">
+      <%= link_to "All Projects", projects_path, class: "px-4 py-2 rounded-full #{params[:category].blank? ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}" %>
+      
+      <% @categories.each do |category| %>
+        <%= link_to category, projects_path(category: category), class: "px-4 py-2 rounded-full #{params[:category] == category ? 'bg-indigo-600 text-white' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}" %>
+      <% end %>
+    </div>
+  </div>
+  
+  <% if @current_category.present? %>
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold"><%= @current_category %> Projects</h2>
+      <p class="text-gray-600">Showing <%= pluralize(@projects.count, 'project') %> in <%= @current_category %></p>
+    </div>
+  <% end %>
+  
+  <% if @projects.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @projects.each do |project| %>
+        <div class="h-full flex">
+          <%= render 'project_card', project: project %>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-gray-50 p-8 rounded-lg text-center">
+      <h3 class="text-xl font-semibold mb-2">No projects found</h3>
+      <% if @current_category.present? %>
+        <p class="text-gray-600 mb-4">There are no projects in the <%= @current_category %> category yet.</p>
+        <%= link_to "View all projects", projects_path, class: "text-indigo-600 hover:text-indigo-800" %>
+      <% else %>
+        <p class="text-gray-600">There are no projects available at the moment.</p>
+      <% end %>
+    </div>
+  <% end %>
+</div>

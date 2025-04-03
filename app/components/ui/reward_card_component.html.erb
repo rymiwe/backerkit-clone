@@ -1,0 +1,39 @@
+<div class="bg-white rounded-lg shadow p-6 border border-gray-200">
+  <div class="flex justify-between items-start mb-4">
+    <div>
+      <h3 class="text-xl font-bold"><%= number_to_currency(reward.amount) %></h3>
+      <h4 class="text-lg font-medium text-gray-900 mb-2"><%= reward.title %></h4>
+    </div>
+    <span class="text-sm text-gray-500 font-medium"><%= backer_text %></span>
+  </div>
+  
+  <p class="text-gray-700 mb-4"><%= reward.description %></p>
+  
+  <div class="grid grid-cols-2 gap-4 mb-4">
+    <div>
+      <span class="text-xs text-gray-500 font-medium block">Estimated Delivery</span>
+      <span class="text-sm font-medium"><%= estimated_delivery %></span>
+    </div>
+    <div>
+      <span class="text-xs text-gray-500 font-medium block">Shipping Date</span>
+      <span class="text-sm font-medium"><%= estimated_shipping %></span>
+    </div>
+  </div>
+  
+  <div class="border-t border-gray-200 pt-4 mb-4">
+    <h5 class="text-sm font-medium text-gray-700 mb-2">Fulfillment Status</h5>
+    <%= render Ui::FulfillmentStatusComponent.new(status: status, progress: progress) %>
+  </div>
+  
+  <% if can_update? %>
+    <div class="mt-4 flex justify-end">
+      <button 
+        data-controller="modal" 
+        data-action="click->modal#open" 
+        data-modal-target="update-fulfillment-<%= reward.id %>"
+        class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+        Update Status
+      </button>
+    </div>
+  <% end %>
+</div>

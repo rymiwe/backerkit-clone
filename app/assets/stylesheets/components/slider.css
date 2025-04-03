@@ -1,0 +1,63 @@
+/* Custom styling for range input slider */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 8px;
+  background: #e5e7eb; /* Gray-200 from Tailwind */
+  outline: none;
+  border-radius: 9999px;
+}
+
+/* Chrome/Safari/Edge styling for the thumb */
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  background: #4f46e5; /* Indigo-600 from Tailwind */
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* Firefox styling for the thumb */
+input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  background: #4f46e5; /* Indigo-600 from Tailwind */
+  cursor: pointer;
+  border-radius: 50%;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+/* The colored fill to the left of the slider thumb */
+.slider-with-fill {
+  position: relative;
+  height: 8px; /* Match the height of the range input */
+}
+
+.slider-with-fill::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: var(--fill-percentage, 0%);
+  background: #3b82f6; /* Blue-500 from Tailwind - a consistent blue for all sliders */
+  border-radius: 9999px 0 0 9999px;
+  pointer-events: none; /* Allow clicks to pass through to the slider */
+  z-index: 1;
+}
+
+/* We'll keep these for the JavaScript color changing functionality, but default to a consistent blue */
+.slider-with-fill.not-started::before,
+.slider-with-fill.in-production::before,
+.slider-with-fill.in-transit::before,
+.slider-with-fill.shipping-soon::before,
+.slider-with-fill.shipping::before,
+.slider-with-fill.completed::before {
+  background: #3b82f6; /* Blue-500 from Tailwind */
+}

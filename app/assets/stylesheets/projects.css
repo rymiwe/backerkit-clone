@@ -1,0 +1,31 @@
+/* Project card styling */
+.project-card-image {
+  width: 100%;
+  height: 192px; /* Fixed height */
+  object-fit: cover;
+  object-position: center;
+}
+
+.project-card-image-container {
+  width: 100%;
+  height: 192px;
+  overflow: hidden;
+  position: relative;
+  background-color: #f3f4f6;
+}
+
+/* Project show page styling */
+.project-header-image {
+  width: 100%;
+  height: 320px;
+  object-fit: cover;
+  object-position: center;
+}
+
+.project-header-container {
+  width: 100%;
+  height: 320px;
+  overflow: hidden;
+  position: relative;
+  background-color: #f3f4f6;
+}

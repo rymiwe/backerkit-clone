@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  backer: one
+  campaign: one
+  reward: one
+  amount: 9.99
+  status: MyString
+
+two:
+  backer: two
+  campaign: two
+  reward: two
+  amount: 9.99
+  status: MyString

@@ -1,0 +1,200 @@
+<div class="max-w-6xl mx-auto px-4 py-8">
+  <div class="bg-white shadow-xl rounded-lg overflow-hidden">
+    <!-- Project Header -->
+    <div class="relative">
+      <% if @project.image_url.present? %>
+        <div class="project-header-container">
+          <%= image_tag @project.image_url, alt: @project.title, class: "project-header-image", loading: "lazy" %>
+          <% if @project.category.present? %>
+            <span class="absolute top-3 left-3 inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full z-10">
+              <%= link_to @project.category, projects_path(category: @project.category), class: "hover:text-indigo-900" %>
+            </span>
+          <% end %>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent z-10 pointer-events-none"></div>
+          <div class="absolute bottom-0 left-0 p-6 w-full z-10">
+            <h1 class="text-3xl font-bold text-white mb-2"><%= @project.title %></h1>
+            <p class="text-white/80"><%= truncate(@project.description, length: 120) %></p>
+          </div>
+        </div>
+      <% else %>
+        <div class="h-80 bg-gray-100 flex flex-col items-center justify-center relative p-6">
+          <svg class="h-24 w-24 text-gray-300 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+          </svg>
+          <% if @project.category.present? %>
+            <span class="inline-block bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full mb-4">
+              <%= link_to @project.category, projects_path(category: @project.category), class: "hover:text-indigo-900" %>
+            </span>
+          <% end %>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2 text-center"><%= @project.title %></h1>
+          <p class="text-gray-600 text-center"><%= truncate(@project.description, length: 120) %></p>
+        </div>
+      <% end %>
+      
+      <div class="absolute top-0 right-0 p-4 z-20" style="pointer-events: auto;">
+        <% if current_user && @project.creator == current_user %>
+          <div class="flex space-x-2">
+            <a href="<%= project_dashboard_path(@project) %>" style="display: inline-block; padding: 0.5rem 1rem; background-color: #4f46e5; color: white; font-weight: 500; border-radius: 0.375rem; text-decoration: none; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">Dashboard</a>
+            <a href="/projects/<%= @project.id %>/fulfillment_dashboard" style="display: inline-block; padding: 0.5rem 1rem; background-color: #16a34a; color: white; font-weight: 500; border-radius: 0.375rem; text-decoration: none; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);">Fulfillment</a>
+            <a href="<%= edit_project_path(@project) %>" style="display: inline-block; padding: 0.5rem 1rem; background-color: white; color: #374151; font-weight: 500; border-radius: 0.375rem; text-decoration: none; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); border: 1px solid #d1d5db;">Edit</a>
+            <form action="<%= project_path(@project) %>" method="post" style="display: inline-block;">
+              <input type="hidden" name="_method" value="delete">
+              <input type="hidden" name="authenticity_token" value="<%= form_authenticity_token %>">
+              <button type="submit" style="display: inline-block; padding: 0.5rem 1rem; background-color: #dc2626; color: white; font-weight: 500; border-radius: 0.375rem; border: none; box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1); cursor: pointer;" onclick="return confirm('Are you sure you want to delete this project?')">Delete</button>
+            </form>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Project Content -->
+    <div class="p-6">
+      <div class="flex flex-col md:flex-row">
+        <!-- Left Column: Project Details -->
+        <div class="md:w-2/3 pr-8">
+          <div class="mb-6">
+            <p class="text-sm text-gray-500">
+              Created by <%= @project.creator.name %> | 
+              <%= @project.category.present? ? link_to(@project.category, projects_path(category: @project.category)) : 'Uncategorized' %>
+            </p>
+            <% if current_user && @project.creator == current_user %>
+              <!-- Fulfillment button moved to header -->
+            <% end %>
+          </div>
+          
+          <div class="prose max-w-none">
+            <p class="text-gray-700"><%= @project.description %></p>
+          </div>
+        </div>
+        
+        <!-- Right Column: Funding Status -->
+        <div class="md:w-1/3 mt-8 md:mt-0">
+          <div class="bg-gray-50 p-6 rounded-lg">
+            <!-- Progress Bar -->
+            <div class="mb-4">
+              <div class="h-4 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-indigo-600 rounded-full" style="width: <%= @project.funded_percentage %>%"></div>
+              </div>
+              <p class="text-right text-sm text-gray-600 mt-1"><%= @project.funded_percentage %>% funded</p>
+            </div>
+            
+            <!-- Stats -->
+            <div class="grid grid-cols-2 gap-4 mb-6">
+              <div>
+                <p class="text-2xl font-bold"><%= number_to_currency(@project.pledges.sum(:amount)) %></p>
+                <p class="text-sm text-gray-600">pledged of <%= number_to_currency(@project.goal) %> goal</p>
+              </div>
+              <div>
+                <p class="text-2xl font-bold"><%= @project.total_backers %></p>
+                <p class="text-sm text-gray-600">backers</p>
+              </div>
+              <div>
+                <p class="text-2xl font-bold"><%= @project.days_remaining %></p>
+                <p class="text-sm text-gray-600">days to go</p>
+              </div>
+            </div>
+            
+            <!-- Back this project button -->
+            <% if current_user && current_user != @project.creator && @project.days_remaining > 0 %>
+              <%= link_to "Back this project", new_project_pledge_path(@project), class: "w-full bg-indigo-600 text-white py-3 px-4 rounded text-center font-medium hover:bg-indigo-700 block" %>
+            <% elsif !current_user %>
+              <%= link_to "Sign in to back this project", login_path, class: "w-full bg-indigo-600 text-white py-3 px-4 rounded text-center font-medium hover:bg-indigo-700 block" %>
+            <% elsif @project.days_remaining <= 0 %>
+              <div class="w-full bg-gray-400 text-white py-3 px-4 rounded text-center font-medium">
+                Campaign ended
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Rewards Section -->
+  <div class="mt-12">
+    <div class="flex justify-between items-center mb-6">
+      <h2 class="text-2xl font-bold text-gray-900">Rewards</h2>
+      <% if current_user && @project.creator == current_user %>
+        <%= link_to new_project_reward_path(@project), class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+          <span class="text-lg font-bold mr-1">+</span>
+          Add Reward
+        <% end %>
+      <% end %>
+    </div>
+    
+    <% if @project.rewards.any? %>
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <% @project.rewards.each do |reward| %>
+          <div class="bg-white shadow rounded-lg p-6 border border-gray-200">
+            <h3 class="text-xl font-bold mb-2"><%= number_to_currency(reward.amount) %> or more</h3>
+            <h4 class="text-lg mb-4"><%= reward.title %></h4>
+            <p class="text-gray-700 mb-4"><%= reward.description %></p>
+            <% if reward.estimated_delivery %>
+              <p class="text-sm text-gray-500 mb-4">Estimated delivery: <%= reward.estimated_delivery.strftime("%B %Y") %></p>
+            <% end %>
+            
+            <!-- Fulfillment Status -->
+            <div class="mb-4">
+              <div class="flex items-center justify-between mb-1">
+                <span class="text-sm font-medium text-gray-700">Fulfillment Status</span>
+                <span class="text-xs font-medium <%= reward.status == 'completed' ? 'text-green-700' : 'text-gray-500' %>">
+                  <%= reward.status_name %>
+                </span>
+              </div>
+              <div class="w-full bg-gray-200 rounded-full h-2">
+                <div class="bg-<%= reward.status_color %>-600 h-2 rounded-full" style="width: <%= reward.fulfillment_progress %>%"></div>
+              </div>
+            </div>
+            
+            <p class="text-sm text-gray-500 mb-4">
+              <% if reward.pledges.count == 1 %>
+                1 backer
+              <% else %>
+                <%= reward.pledges.count %> backers
+              <% end %>
+            </p>
+            
+            <% if current_user && current_user != @project.creator && @project.days_remaining > 0 %>
+              <%= link_to "Select this reward", new_project_pledge_path(@project, reward_id: reward.id), class: "w-full bg-indigo-100 text-indigo-700 py-2 px-4 rounded text-center font-medium hover:bg-indigo-200 block" %>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="bg-white shadow rounded-lg p-8 text-center">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+        </svg>
+        <h3 class="mt-2 text-lg font-medium text-gray-900">No rewards yet</h3>
+        <p class="mt-1 text-sm text-gray-500">
+          <% if current_user && @project.creator == current_user %>
+            Add rewards to encourage backers to support your project.
+          <% else %>
+            This project doesn't have any rewards yet.
+          <% end %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Related Projects Section -->
+<% if @related_projects.present? && @related_projects.any? %>
+  <div class="bg-gray-50 py-12">
+    <div class="container mx-auto px-4">
+      <h2 class="text-2xl font-bold mb-8">More <%= @project.category %> Projects</h2>
+      
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <% @related_projects.each do |project| %>
+          <div class="h-full flex">
+            <%= render 'project_card', project: project %>
+          </div>
+        <% end %>
+      </div>
+      
+      <div class="mt-8 text-center">
+        <%= link_to "View all #{@project.category} projects", projects_path(category: @project.category), class: "inline-block px-6 py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors" %>
+      </div>
+    </div>
+  </div>
+<% end %>

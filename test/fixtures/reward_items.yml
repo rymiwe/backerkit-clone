@@ -1,0 +1,19 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  name: MyString
+  description: MyText
+  quantity_per_reward: 1
+  total_needed: 1
+  produced_count: 1
+  shipped_count: 1
+  reward: one
+
+two:
+  name: MyString
+  description: MyText
+  quantity_per_reward: 1
+  total_needed: 1
+  produced_count: 1
+  shipped_count: 1
+  reward: two

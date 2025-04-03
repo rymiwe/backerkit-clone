@@ -1,0 +1,91 @@
+<div class="max-w-7xl mx-auto px-4 py-8 sm:px-6 lg:px-8">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Projects I've Created</h1>
+    <%= link_to "← Back to Dashboard", dashboard_path, class: "text-indigo-600 hover:text-indigo-800" %>
+  </div>
+  
+  <div class="mb-6 flex justify-end">
+    <%= link_to new_project_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+      <svg class="-ml-1 mr-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+        <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+      </svg>
+      Create New Project
+    <% end %>
+  </div>
+  
+  <% if @created_projects.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @created_projects.each do |project| %>
+        <div class="bg-white rounded-lg shadow overflow-hidden hover:shadow-lg transition-shadow duration-300">
+          <% if project.image_url.present? %>
+            <div class="h-48 bg-cover bg-center relative" style="background-image: url('<%= project.image_url %>')">
+              <% if project.category.present? %>
+                <span class="absolute top-2 left-2 inline-block bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full">
+                  <%= project.category %>
+                </span>
+              <% end %>
+              <div class="absolute top-2 right-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-<%= project.status == 'active' ? 'green' : 'gray' %>-100 text-<%= project.status == 'active' ? 'green' : 'gray' %>-800">
+                  <%= project.status.capitalize %>
+                </span>
+              </div>
+            </div>
+          <% else %>
+            <div class="h-48 bg-gray-100 flex items-center justify-center relative">
+              <% if project.category.present? %>
+                <span class="absolute top-2 left-2 inline-block bg-indigo-100 text-indigo-700 text-xs px-2 py-1 rounded-full">
+                  <%= project.category %>
+                </span>
+              <% end %>
+              <div class="absolute top-2 right-2">
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-<%= project.status == 'active' ? 'green' : 'gray' %>-100 text-<%= project.status == 'active' ? 'green' : 'gray' %>-800">
+                  <%= project.status.capitalize %>
+                </span>
+              </div>
+              <svg class="h-16 w-16 text-gray-300" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+              </svg>
+            </div>
+          <% end %>
+          
+          <div class="p-5">
+            <h3 class="text-lg font-bold text-gray-900 mb-2">
+              <%= link_to project.title, project_path(project), class: "hover:text-indigo-600" %>
+            </h3>
+            <p class="text-gray-600 text-sm mb-4"><%= truncate(project.description, length: 100) %></p>
+            
+            <div class="flex justify-between text-sm mb-2">
+              <span class="text-gray-500"><%= project.pledges.count %> backers</span>
+              <span class="font-medium"><%= number_to_currency(project.pledges.sum(:amount)) %> raised</span>
+            </div>
+            
+            <div class="h-2 bg-gray-200 rounded-full overflow-hidden mb-2">
+              <div class="h-full bg-indigo-600 rounded-full" style="width: <%= project.funded_percentage %>%"></div>
+            </div>
+            <p class="text-right text-xs text-gray-500 mb-4"><%= project.funded_percentage %>% of <%= number_to_currency(project.goal) %> goal</p>
+            
+            <div class="mt-4 pt-4 border-t border-gray-100 flex justify-between items-center">
+              <span class="text-sm text-gray-500"><%= pluralize(project.days_remaining, 'day') %> left</span>
+              <div class="flex space-x-2">
+                <%= link_to "Edit", edit_project_path(project), class: "text-indigo-600 hover:text-indigo-800 text-sm font-medium" %>
+                <%= link_to "Rewards", project_rewards_path(project), class: "text-indigo-600 hover:text-indigo-800 text-sm font-medium" %>
+                <%= link_to "View", project_path(project), class: "text-indigo-600 hover:text-indigo-800 text-sm font-medium" %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-white shadow rounded-lg p-8 text-center">
+      <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+      </svg>
+      <h3 class="mt-2 text-lg font-medium text-gray-900">No created projects yet</h3>
+      <p class="mt-1 text-sm text-gray-500">You haven't created any projects yet.</p>
+      <div class="mt-6">
+        <%= link_to "Create a Project", new_project_path, class: "inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md shadow-sm text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+      </div>
+    </div>
+  <% end %>
+</div>

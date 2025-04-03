@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  title: MyString
+  description: MyText
+  goal: 9.99
+  end_date: 2025-04-01 15:52:50
+  creator: one
+  status: MyString
+
+two:
+  title: MyString
+  description: MyText
+  goal: 9.99
+  end_date: 2025-04-01 15:52:50
+  creator: two
+  status: MyString

@@ -1,0 +1,18 @@
+/* Custom styles to fix specific layout issues */
+.empty-projects-container {
+  position: relative;
+  min-height: 300px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3rem;
+}
+
+.empty-projects-text {
+  margin-bottom: 2rem;
+}
+
+.empty-projects-button {
+  margin-top: auto;
+}

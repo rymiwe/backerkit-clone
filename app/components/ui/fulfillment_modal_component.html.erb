@@ -1,0 +1,50 @@
+<div id="<%= modal_id %>" data-controller="modal" class="hidden fixed inset-0 z-50">
+  <div class="fixed inset-0 bg-gray-900 bg-opacity-50 transition-opacity" data-action="click->modal#close"></div>
+  
+  <div class="flex items-center justify-center min-h-screen p-4">
+    <div class="bg-white rounded-lg shadow-xl overflow-hidden max-w-lg w-full">
+      <div class="flex justify-between items-center p-6 border-b border-gray-200">
+        <h3 class="text-lg font-medium text-gray-900">Update Fulfillment Status</h3>
+        <button data-action="modal#close" class="text-gray-400 hover:text-gray-500">
+          <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+      </div>
+      
+      <%= form_with url: form_url, method: :patch, class: "p-6" do |form| %>
+        <%= form.hidden_field :reward_id, value: reward.id %>
+        
+        <div class="mb-4">
+          <label class="block text-sm font-medium text-gray-700 mb-1">Reward</label>
+          <p class="text-gray-900 font-medium"><%= reward.title %> (<%= number_to_currency(reward.amount) %>)</p>
+        </div>
+        
+        <div class="mb-4">
+          <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <%= form.select "reward[status]", status_options, { selected: reward.status }, 
+            class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" %>
+        </div>
+        
+        <div class="mb-4">
+          <label for="fulfillment_progress" class="block text-sm font-medium text-gray-700 mb-1">Progress (%)</label>
+          <%= form.number_field "reward[fulfillment_progress]", min: 0, max: 100, value: reward.fulfillment_progress, 
+            class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" %>
+        </div>
+        
+        <div class="mb-6">
+          <label for="estimated_shipping_date" class="block text-sm font-medium text-gray-700 mb-1">Estimated Shipping Date</label>
+          <%= form.date_field "reward[estimated_shipping_date]", value: reward.estimated_shipping_date, 
+            class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500" %>
+        </div>
+        
+        <div class="flex justify-end">
+          <button type="button" data-action="modal#close" class="mr-3 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Cancel
+          </button>
+          <%= form.submit "Save Changes", class: "px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,101 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <div class="flex items-center justify-between mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Edit Project</h1>
+    <%= link_to "← Back to Project", project_path(@project), class: "text-indigo-600 hover:text-indigo-800" %>
+  </div>
+  
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+    <!-- Main Project Form -->
+    <div class="lg:col-span-2">
+      <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <h2 class="text-xl font-bold text-gray-900 mb-6">Project Details</h2>
+        <%= render 'form', project: @project %>
+      </div>
+      
+      <div class="bg-white shadow-md rounded-lg p-6 mb-8">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-bold text-gray-900">Project Rewards</h2>
+          <%= link_to new_project_reward_path(@project), class: "inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" do %>
+            <svg class="-ml-1 mr-1 h-4 w-4" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+              <path fill-rule="evenodd" d="M10 5a1 1 0 011 1v3h3a1 1 0 110 2h-3v3a1 1 0 11-2 0v-3H6a1 1 0 110-2h3V6a1 1 0 011-1z" clip-rule="evenodd" />
+            </svg>
+            Add Reward
+          <% end %>
+        </div>
+        
+        <% if @project.rewards.any? %>
+          <div class="space-y-4">
+            <% @project.rewards.each do |reward| %>
+              <div class="border border-gray-200 rounded-md p-4 hover:bg-gray-50">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h3 class="font-medium text-gray-900"><%= reward.title %></h3>
+                    <p class="text-sm text-gray-600 mt-1"><%= number_to_currency(reward.amount) %></p>
+                  </div>
+                  <%= link_to "Edit", edit_project_reward_path(@project, reward), class: "text-indigo-600 hover:text-indigo-800 text-sm" %>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="text-center py-6 bg-gray-50 rounded-md">
+            <svg class="mx-auto h-10 w-10 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+            </svg>
+            <p class="mt-2 text-sm text-gray-500">No rewards yet. Add rewards to encourage backers to support your project.</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+    
+    <!-- Sidebar -->
+    <div class="lg:col-span-1">
+      <!-- Project Status -->
+      <%= render 'status_form', project: @project %>
+      
+      <!-- Project Stats -->
+      <div class="bg-white shadow-md rounded-lg p-6 mt-8">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Project Stats</h3>
+        
+        <div class="space-y-4">
+          <div>
+            <p class="text-sm font-medium text-gray-500">Funding Progress</p>
+            <div class="mt-1 flex items-center">
+              <div class="flex-1 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div class="h-full bg-indigo-600 rounded-full" style="width: <%= @project.funded_percentage %>%"></div>
+              </div>
+              <span class="ml-2 text-sm font-medium text-gray-900"><%= @project.funded_percentage %>%</span>
+            </div>
+            <p class="mt-1 text-xs text-gray-500"><%= number_to_currency(@project.pledges.sum(:amount)) %> of <%= number_to_currency(@project.goal) %> goal</p>
+          </div>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <p class="text-sm font-medium text-gray-500">Backers</p>
+              <p class="mt-1 text-2xl font-semibold text-gray-900"><%= @project.pledges.select(:backer_id).distinct.count %></p>
+            </div>
+            <div>
+              <p class="text-sm font-medium text-gray-500">Days Left</p>
+              <p class="mt-1 text-2xl font-semibold text-gray-900"><%= @project.days_remaining %></p>
+            </div>
+          </div>
+          
+          <div>
+            <p class="text-sm font-medium text-gray-500">End Date</p>
+            <p class="mt-1 text-sm text-gray-900"><%= @project.end_date.strftime("%B %d, %Y") %></p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Danger Zone -->
+      <div class="bg-white shadow-md rounded-lg p-6 mt-8">
+        <h3 class="text-lg font-medium text-red-600 mb-4">Danger Zone</h3>
+        <p class="text-sm text-gray-600 mb-4">Once you delete a project, there is no going back. Please be certain.</p>
+        
+        <%= button_to "Delete Project", project_path(@project), method: :delete, 
+            data: { confirm: "Are you sure you want to delete this project? This action cannot be undone." }, 
+            class: "w-full bg-red-100 text-red-700 hover:bg-red-200 py-2 px-4 rounded text-center font-medium" %>
+      </div>
+    </div>
+  </div>
+</div>
