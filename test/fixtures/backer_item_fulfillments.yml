@@ -1,0 +1,15 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  pledge: one
+  reward_item: one
+  shipped: false
+  shipped_at: 2025-04-03 16:33:38
+  notes: MyText
+
+two:
+  pledge: two
+  reward_item: two
+  shipped: false
+  shipped_at: 2025-04-03 16:33:38
+  notes: MyText

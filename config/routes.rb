@@ -20,6 +20,17 @@ Rails.application.routes.draw do
     patch 'fulfillment_dashboard/update_reward', to: 'fulfillment_dashboard#update_reward', as: 'fulfillment_dashboard_update_reward'
     patch 'fulfillment_dashboard/update_item_counts', to: 'fulfillment_dashboard#update_item_counts'
     
+    # Fulfillment Wave routes
+    resources :fulfillment_waves
+    
+    # Backer Item Fulfillment routes
+    resources :pledges do
+      patch 'update_item_fulfillments', to: 'backer_item_fulfillments#update_for_backer'
+    end
+    
+    post 'bulk_update_item_fulfillments', to: 'backer_item_fulfillments#bulk_update'
+    post 'generate_fulfillments/:reward_id', to: 'backer_item_fulfillments#generate_for_reward', as: 'generate_fulfillments'
+    
     # Fulfillment routes
     get 'fulfillment', to: 'fulfillment#index', as: 'fulfillment'
     patch 'fulfillment/update_reward', to: 'fulfillment#update_reward', as: 'update_reward_fulfillment'

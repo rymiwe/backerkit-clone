@@ -1,5 +1,8 @@
 class RewardItem < ApplicationRecord
   belongs_to :reward
+  has_many :wave_items, dependent: :destroy
+  has_many :fulfillment_waves, through: :wave_items
+  has_many :backer_item_fulfillments, dependent: :destroy
   
   validates :name, presence: true
   validates :quantity_per_reward, presence: true, numericality: { greater_than: 0 }
@@ -48,6 +51,28 @@ class RewardItem < ApplicationRecord
     when "in_progress" then "In Progress"
     else "Not Started"
     end
+  end
+  
+  # New methods for tracking individual backer fulfillment
+  def fulfilled_for_backer?(pledge)
+    backer_item_fulfillments.where(pledge: pledge, shipped: true).exists?
+  end
+  
+  def create_backer_fulfillments!
+    reward.pledges.each do |pledge|
+      # Only create if it doesn't already exist
+      unless backer_item_fulfillments.exists?(pledge: pledge)
+        backer_item_fulfillments.create!(pledge: pledge, shipped: false)
+      end
+    end
+  end
+  
+  def fulfillment_rate
+    total_backers = reward.pledges.count
+    return 0 if total_backers.zero?
+    
+    fulfilled_backers = backer_item_fulfillments.where(shipped: true).count
+    [(fulfilled_backers.to_f / total_backers * 100).round, 100].min
   end
   
   private

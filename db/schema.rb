@@ -10,15 +10,38 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_03_195128) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_03_234212) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
+
+  create_table "backer_item_fulfillments", force: :cascade do |t|
+    t.bigint "pledge_id", null: false
+    t.bigint "reward_item_id", null: false
+    t.boolean "shipped"
+    t.datetime "shipped_at"
+    t.text "notes"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["pledge_id"], name: "index_backer_item_fulfillments_on_pledge_id"
+    t.index ["reward_item_id"], name: "index_backer_item_fulfillments_on_reward_item_id"
+  end
 
   create_table "backers", force: :cascade do |t|
     t.string "name"
     t.string "email"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+  end
+
+  create_table "fulfillment_waves", force: :cascade do |t|
+    t.bigint "project_id", null: false
+    t.string "name"
+    t.date "target_ship_date"
+    t.text "description"
+    t.string "status"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["project_id"], name: "index_fulfillment_waves_on_project_id"
   end
 
   create_table "pledges", force: :cascade do |t|
@@ -29,6 +52,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_03_195128) do
     t.string "status", default: "pending"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "fulfillment_status", default: "not_started", null: false
     t.index ["backer_id"], name: "index_pledges_on_backer_id"
     t.index ["project_id"], name: "index_pledges_on_project_id"
     t.index ["reward_id"], name: "index_pledges_on_reward_id"
@@ -101,6 +125,19 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_03_195128) do
     t.index ["email"], name: "index_users_on_email", unique: true
   end
 
+  create_table "wave_items", force: :cascade do |t|
+    t.bigint "fulfillment_wave_id", null: false
+    t.bigint "reward_item_id", null: false
+    t.integer "quantity"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["fulfillment_wave_id"], name: "index_wave_items_on_fulfillment_wave_id"
+    t.index ["reward_item_id"], name: "index_wave_items_on_reward_item_id"
+  end
+
+  add_foreign_key "backer_item_fulfillments", "pledges"
+  add_foreign_key "backer_item_fulfillments", "reward_items"
+  add_foreign_key "fulfillment_waves", "projects"
   add_foreign_key "pledges", "projects"
   add_foreign_key "pledges", "rewards"
   add_foreign_key "pledges", "users", column: "backer_id"
@@ -108,4 +145,6 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_03_195128) do
   add_foreign_key "reward_items", "rewards"
   add_foreign_key "rewards", "projects"
   add_foreign_key "surveys", "projects"
+  add_foreign_key "wave_items", "fulfillment_waves", column: "fulfillment_wave_id"
+  add_foreign_key "wave_items", "reward_items"
 end

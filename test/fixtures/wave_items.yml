@@ -1,0 +1,11 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  fulfillment_wave: one
+  reward_item: one
+  quantity: 1
+
+two:
+  fulfillment_wave: two
+  reward_item: two
+  quantity: 1

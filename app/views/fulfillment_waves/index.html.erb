@@ -1,0 +1,80 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Fulfillment Waves</h1>
+    <%= link_to "Create New Wave", new_project_fulfillment_wave_path(@project), class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
+  </div>
+  
+  <div class="bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="border-b border-gray-200 px-6 py-4">
+      <h2 class="text-lg font-medium text-gray-900">Project: <%= @project.title %></h2>
+      <p class="text-sm text-gray-600">Organize your item fulfillment into waves for more efficient shipping</p>
+    </div>
+    
+    <% if @fulfillment_waves.empty? %>
+      <div class="px-6 py-8 text-center">
+        <p class="text-gray-500">No fulfillment waves have been created yet.</p>
+        <p class="text-sm text-gray-400 mt-2">Create a wave to group items for shipment together.</p>
+      </div>
+    <% else %>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Wave Name</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Target Ship Date</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @fulfillment_waves.each do |wave| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900"><%= wave.name %></div>
+                <div class="text-sm text-gray-500"><%= pluralize(wave.wave_items.count, 'item') %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-900"><%= wave.target_ship_date.strftime("%b %d, %Y") %></div>
+                <div class="text-sm text-gray-500">
+                  <% if wave.target_ship_date < Date.today && wave.status != 'completed' %>
+                    <span class="text-red-500">Past due</span>
+                  <% elsif wave.target_ship_date == Date.today %>
+                    <span class="text-yellow-500">Today</span>
+                  <% else %>
+                    <span><%= distance_of_time_in_words_to_now(wave.target_ship_date) %> from now</span>
+                  <% end %>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% status_class = case wave.status 
+                   when 'planned' then 'bg-gray-100 text-gray-800'
+                   when 'in_progress' then 'bg-blue-100 text-blue-800'
+                   when 'shipping' then 'bg-yellow-100 text-yellow-800'
+                   when 'completed' then 'bg-green-100 text-green-800'
+                   end %>
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full <%= status_class %>">
+                  <%= wave.status.titleize %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                  <div class="bg-blue-600 h-2.5 rounded-full" style="width: <%= wave.progress_percentage %>%"></div>
+                </div>
+                <div class="text-sm text-gray-500 mt-1"><%= wave.progress_percentage %>% complete</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                <%= link_to "View", project_fulfillment_wave_path(@project, wave), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
+                <%= link_to "Edit", edit_project_fulfillment_wave_path(@project, wave), class: "text-indigo-600 hover:text-indigo-900 mr-3" %>
+                <%= link_to "Delete", project_fulfillment_wave_path(@project, wave), method: :delete, data: { confirm: "Are you sure you want to delete this fulfillment wave?" }, class: "text-red-600 hover:text-red-900" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    <% end %>
+  </div>
+  
+  <div class="mt-8">
+    <%= link_to "Back to Fulfillment Dashboard", project_fulfillment_dashboard_path(@project), class: "text-indigo-600 hover:text-indigo-800" %>
+  </div>
+</div>
