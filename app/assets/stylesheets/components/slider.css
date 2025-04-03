@@ -7,6 +7,8 @@ input[type="range"] {
   background: #e5e7eb; /* Gray-200 from Tailwind */
   outline: none;
   border-radius: 9999px;
+  position: relative;
+  z-index: 2;
 }
 
 /* Chrome/Safari/Edge styling for the thumb */
@@ -44,12 +46,12 @@ input[type="range"]::-moz-range-thumb {
   position: absolute;
   left: 0;
   top: 0;
-  height: 100%;
+  height: 8px;
   width: var(--fill-percentage, 0%);
   background: #3b82f6; /* Blue-500 from Tailwind - a consistent blue for all sliders */
   border-radius: 9999px 0 0 9999px;
   pointer-events: none; /* Allow clicks to pass through to the slider */
-  z-index: 1;
+  z-index: 0;
 }
 
 /* We'll keep these for the JavaScript color changing functionality, but default to a consistent blue */
