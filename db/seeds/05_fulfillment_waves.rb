@@ -30,11 +30,16 @@ if alien_project
       quantity: [50, 75, 100, 125][index % 4]
     )
     
+    # First ensure total_needed is set properly
+    item.update!(
+      total_needed: wave_item.quantity
+    )
+    
     # Create more progress for this wave (75-95%)
     progress_percentage = 75 + rand(0..20)
     
     # Update produced and shipped counts for visible progress
-    item.update(
+    item.update!(
       produced_count: (wave_item.quantity * progress_percentage / 100.0).round,
       shipped_count: (wave_item.quantity * (progress_percentage - 15) / 100.0).round
     )
@@ -69,11 +74,16 @@ if alien_project
       quantity: [200, 150, 175][index % 3]
     )
     
+    # First ensure total_needed is set properly
+    item.update!(
+      total_needed: wave_item.quantity
+    )
+    
     # Create less progress for this wave (10-30%)
     progress_percentage = 10 + rand(0..20)
     
     # Update produced counts for visible progress, but no shipping yet
-    item.update(
+    item.update!(
       produced_count: (wave_item.quantity * progress_percentage / 100.0).round,
       shipped_count: 0
     )
@@ -99,12 +109,17 @@ if alien_project
       quantity: [40, 30][index % 2]
     )
     
+    # First ensure total_needed is set properly
+    item.update!(
+      total_needed: wave_item.quantity
+    )
+    
     # High production but partial shipping (80-100% produced, 40-60% shipped)
     produced_percentage = 80 + rand(0..20)
     shipped_percentage = 40 + rand(0..20)
     
-    # Update counts for visible progress
-    item.update(
+    # Update the item's counters
+    item.update!(
       produced_count: (wave_item.quantity * produced_percentage / 100.0).round,
       shipped_count: (wave_item.quantity * shipped_percentage / 100.0).round
     )
@@ -136,8 +151,13 @@ if alien_project
       quantity: 25
     )
     
+    # First ensure total_needed is set properly
+    item.update!(
+      total_needed: wave_item.quantity
+    )
+    
     # 100% completed
-    item.update(
+    item.update!(
       produced_count: wave_item.quantity,
       shipped_count: wave_item.quantity
     )
@@ -178,8 +198,13 @@ if game_project
       quantity: 300
     )
     
+    # First ensure total_needed is set properly
+    item.update!(
+      total_needed: wave_item.quantity
+    )
+    
     # 100% completed
-    item.update(
+    item.update!(
       produced_count: wave_item.quantity,
       shipped_count: wave_item.quantity
     )
@@ -220,11 +245,16 @@ if game_project
       quantity: [200, 250][index % 2]
     )
     
+    # First ensure total_needed is set properly
+    item.update!(
+      total_needed: wave_item.quantity
+    )
+    
     # 60-80% progress
     progress_percentage = 60 + rand(0..20)
     
     # Update counts for visible progress
-    item.update(
+    item.update!(
       produced_count: (wave_item.quantity * progress_percentage / 100.0).round,
       shipped_count: (wave_item.quantity * (progress_percentage - 20) / 100.0).round
     )
@@ -254,11 +284,16 @@ if game_project
       quantity: rand(100..150)
     )
     
+    # First ensure total_needed is set properly
+    item.update!(
+      total_needed: wave_item.quantity
+    )
+    
     # 5-15% progress
     progress_percentage = 5 + rand(0..10)
     
     # Update produced counts only
-    item.update(
+    item.update!(
       produced_count: (wave_item.quantity * progress_percentage / 100.0).round,
       shipped_count: 0
     )
@@ -288,8 +323,13 @@ if completed_project
       quantity: quantity
     )
     
+    # First ensure total_needed is set properly
+    item.update!(
+      total_needed: quantity
+    )
+    
     # 100% completed
-    item.update(
+    item.update!(
       produced_count: quantity,
       shipped_count: quantity
     )

@@ -17,8 +17,16 @@ if alien_project
     produced_percentage = 10 + ((index * 17) % 81) # Will give values between 10-90% 
     shipped_percentage = [produced_percentage - 20, 0].max # Shipped count is less than produced
     
+    # Calculate the expected total needed based on quantity_per_reward
+    total_needed = [(item.quantity_per_reward || 1) * 100, 1].max.round
+    
+    # First ensure total_needed is set properly - make it larger than what we'll produce
+    item.update!(
+      total_needed: total_needed
+    )
+    
     # Update the item with varied production data
-    item.update(
+    item.update!(
       produced_count: [(item.quantity_per_reward || 1) * produced_percentage / 100.0, 1].max.round,
       shipped_count: [(item.quantity_per_reward || 1) * shipped_percentage / 100.0, 0].max.round
     )
@@ -41,8 +49,16 @@ if game_project
     produced_percentage = 15 + ((index * 23) % 76) # Different pattern from above (15-90%)
     shipped_percentage = [produced_percentage - 30, 0].max
     
+    # Calculate the expected total needed based on quantity_per_reward
+    total_needed = [(item.quantity_per_reward || 1) * 100, 1].max.round
+    
+    # First ensure total_needed is set properly - make it larger than what we'll produce
+    item.update!(
+      total_needed: total_needed
+    )
+    
     # Update the item with varied shipping data
-    item.update(
+    item.update!(
       produced_count: [(item.quantity_per_reward || 1) * produced_percentage / 100.0, 1].max.round,
       shipped_count: [(item.quantity_per_reward || 1) * shipped_percentage / 100.0, 0].max.round
     )
