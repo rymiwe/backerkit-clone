@@ -1,5 +1,5 @@
-module RewardItem
-  class StatusBadgeComponent < ViewComponent::Base
+module ItemStatus
+  class BadgeComponent < ViewComponent::Base
     attr_reader :status
     
     def initialize(status:)

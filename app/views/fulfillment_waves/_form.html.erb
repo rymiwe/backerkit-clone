@@ -84,7 +84,7 @@
                 <div class="text-xs text-gray-500"><%= pluralize(item.reward.pledges.count, 'backer') %></div>
               </td>
               <td class="px-4 py-2">
-                <%= render(RewardItem::StatusBadgeComponent.new(status: item.status)) %>
+                <%= render(ItemStatus::BadgeComponent.new(status: item.status)) %>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
                 <input type="number" name="wave_items[<%= item.id %>]" 
