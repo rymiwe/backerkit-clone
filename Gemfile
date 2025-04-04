@@ -60,6 +60,9 @@ group :development, :test do
   gem "debug", platforms: %i[ mri mswin mingw x64_mingw ]
   gem "rspec-rails", "~> 6.0"
   gem "factory_bot_rails", "~> 6.2"
+  gem "rubocop", "~> 1.51", require: false
+  gem "rubocop-rails", "~> 2.20", require: false
+  gem "rubocop-rspec", "~> 2.22", require: false
 end
 
 group :development do
