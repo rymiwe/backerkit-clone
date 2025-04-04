@@ -29,7 +29,7 @@ module Fulfillment
     attr_reader :wave, :user, :project, :reward_items
 
     def valid?
-      user == project.creator || user.admin?
+      user == project.creator || user.has_role?('admin')
     end
 
     def update_wave_status
