@@ -2,6 +2,18 @@
   <div class="max-w-6xl mx-auto">
     <h1 class="text-2xl font-bold text-gray-900 mb-6">Edit Fulfillment Wave</h1>
     
+    <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-6">
+      <div class="flex">
+        <div class="ml-3">
+          <p class="text-sm text-blue-700">
+            A fulfillment wave represents a batch of items that will be produced and shipped together. 
+            You can update the wave's details and items below to reflect your current fulfillment schedule.
+            Adjusting target dates will help track progress and keep your backers informed.
+          </p>
+        </div>
+      </div>
+    </div>
+    
     <%= render 'form', fulfillment_wave: @fulfillment_wave, available_items: @available_items, selected_items: @selected_items %>
     
     <div class="mt-6">

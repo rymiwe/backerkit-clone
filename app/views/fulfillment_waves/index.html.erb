@@ -7,13 +7,25 @@
   <div class="bg-white shadow-md rounded-lg overflow-hidden">
     <div class="border-b border-gray-200 px-6 py-4">
       <h2 class="text-lg font-medium text-gray-900">Project: <%= @project.title %></h2>
-      <p class="text-sm text-gray-600">Organize your item fulfillment into waves for more efficient shipping</p>
+      <p class="text-sm text-gray-600 mb-2">Organize your item fulfillment into waves for more efficient shipping</p>
+      <div class="bg-blue-50 border-l-4 border-blue-400 p-4 mb-2">
+        <div class="flex">
+          <div class="ml-3">
+            <p class="text-sm text-blue-700">
+              <strong>What are Fulfillment Waves?</strong> Fulfillment waves are scheduled batches of items that will be produced and shipped together. 
+              By grouping items with similar production timelines or shipping requirements, you can streamline your fulfillment process, 
+              track progress more effectively, and provide your backers with accurate delivery estimates.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
     
     <% if @fulfillment_waves.empty? %>
       <div class="px-6 py-8 text-center">
         <p class="text-gray-500">No fulfillment waves have been created yet.</p>
-        <p class="text-sm text-gray-400 mt-2">Create a wave to group items for shipment together.</p>
+        <p class="text-sm text-gray-400 mt-2">Create your first fulfillment wave to start organizing items for production and shipment.</p>
+        <p class="text-sm text-gray-400 mt-2">We recommend creating separate waves for items with different production timelines or shipping requirements.</p>
       </div>
     <% else %>
       <table class="min-w-full divide-y divide-gray-200">
