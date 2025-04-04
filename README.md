@@ -4,7 +4,7 @@ A functional demonstration app that simulates BackerKit's crowdfunding platform 
 
 ## Live Demo
 
-Visit the live demo at: [https://backerkit-clone.herokuapp.com/](https://backerkit-clone.herokuapp.com/)
+Visit the live demo at: [https://backerkit-clone-ac3c300c1e50.herokuapp.com/](https://backerkit-clone-ac3c300c1e50.herokuapp.com/)
 
 ## Features
 
