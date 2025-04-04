@@ -13,15 +13,12 @@ class ShippingCountValidator < ActiveModel::Validator
     end
 
     # Check if we're trying to produce more items than needed
-    if record.produced_count.to_i > record.needed_count.to_i && record.respond_to?(:needed_count)
-      record.errors.add(:produced_count, "cannot exceed the needed count (#{record.needed_count})")
+    if record.respond_to?(:total_needed) && record.produced_count.to_i > record.total_needed.to_i
+      record.errors.add(:produced_count, "cannot exceed the total needed count (#{record.total_needed})")
     end
 
     # Check if any counts are negative
     record.errors.add(:shipped_count, "cannot be negative") if record.shipped_count.to_i.negative?
-
-    return unless record.produced_count.to_i.negative?
-
-    record.errors.add(:produced_count, "cannot be negative")
+    record.errors.add(:produced_count, "cannot be negative") if record.produced_count.to_i.negative?
   end
 end
