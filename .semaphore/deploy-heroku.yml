@@ -19,20 +19,24 @@ blocks:
             - sem-version ruby 3.3.1
             - curl https://cli-assets.heroku.com/install.sh | sh
             - heroku --version
-            # Set up Heroku auth without .netrc to avoid issues
+            # Set up Heroku auth with the API key from secrets
             - export HEROKU_API_KEY=$HEROKU_API_KEY
-            - echo "Logging in to Heroku Container Registry..."
-            - heroku container:login
+            # Confirm we're authenticated properly before attempting deployment
+            - heroku auth:whoami
+            # Configure git for Heroku deployment
             - git config --global user.name "Semaphore CI"
             - git config --global user.email "ci@semaphore.com"
-            # Deploy with Heroku API directly
+            # Deploy to Heroku - use a more reliable method with better error reporting
             - echo "Deploying to $APP_NAME..."
-            # Create a deployment using Heroku CLI API
-            - heroku authorizations:create --description="Semaphore CI"
-            - heroku apps:info -a $APP_NAME
-            # Deploy the app using the Heroku CLI directly with the API key
+            # Add Heroku as a remote
             - heroku git:remote -a $APP_NAME
-            - git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git HEAD:refs/heads/main
-            # Reset and reseed the database for the demo app
-            - echo "Resetting and reseeding the database..."
-            - heroku run rake db:migrate:reset db:seed -a $APP_NAME
+            # Use standard git push to Heroku without force push to avoid potential issues
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git HEAD:refs/heads/main
+            # Give the app some time to build and deploy before migrating the database
+            - sleep 20
+            # Run database migrations instead of a full reset to avoid data loss in production
+            - echo "Running database migrations..."
+            - heroku run rake db:migrate -a $APP_NAME
+            # Verify deployment
+            - echo "Verifying deployment..."
+            - heroku ps -a $APP_NAME
