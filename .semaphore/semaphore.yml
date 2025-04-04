@@ -42,6 +42,8 @@ blocks:
           - cp config/database.semaphore.yml config/database.yml
           - RAILS_ENV=test bundle exec rake db:create db:schema:load
           - RAILS_ENV=test bundle exec rake db:seed
+          # Precompile assets for test environment to avoid Tailwind CSS issues
+          - RAILS_ENV=test bundle exec rake assets:precompile
       jobs:
         - name: RSpec Tests
           commands:
