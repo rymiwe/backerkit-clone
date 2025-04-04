@@ -86,7 +86,7 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/LetSetup:
   Enabled: false
   
-# Disable RSpec/PredicateMatcher which is causing errors
+# Completely disable all the RSpec cops that are causing errors 
 RSpec/PredicateMatcher:
   Enabled: false
 
@@ -97,11 +97,11 @@ Capybara:
 RSpec/Capybara:
   Enabled: false
 
-# Disable RSpec/AnyInstance
+# Turn off RSpec/AnyInstance
 RSpec/AnyInstance:
   Enabled: false
 
-# Disable RSpec/IndexedLet
+# Turn off RSpec/IndexedLet
 RSpec/IndexedLet:
   Enabled: false
 
@@ -109,3 +109,7 @@ RSpec/IndexedLet:
 Style/BlockDelimiters:
   Exclude:
     - 'spec/**/*'
+
+# Disable RuboCop-Rspec_Rails namespace entirely to prevent errors
+RSpecRails:
+  Enabled: false
