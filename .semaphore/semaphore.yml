@@ -1,0 +1,76 @@
+version: v1.0
+name: BackerKit Clone Pipeline
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+
+blocks:
+  - name: "Setup"
+    task:
+      jobs:
+        - name: Bundle Install and Cache
+          commands:
+            - checkout
+            - sem-version ruby 3.3.1
+            - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
+            - bundle install --path vendor/bundle
+            - cache store gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock) vendor/bundle
+
+  - name: "Code Quality"
+    task:
+      prologue:
+        commands:
+          - checkout
+          - sem-version ruby 3.3.1
+          - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
+          - bundle install --path vendor/bundle
+      jobs:
+        - name: Rubocop
+          commands:
+            - bundle exec rubocop
+
+  - name: "Tests"
+    task:
+      prologue:
+        commands:
+          - checkout
+          - sem-version ruby 3.3.1
+          - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
+          - bundle install --path vendor/bundle
+          - sem-service start postgres
+          - bundle exec rake db:setup
+      jobs:
+        - name: RSpec Tests
+          commands:
+            - bundle exec rspec
+
+  - name: "Asset Precompilation Check"
+    task:
+      prologue:
+        commands:
+          - checkout
+          - sem-version ruby 3.3.1
+          - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
+          - bundle install --path vendor/bundle
+      jobs:
+        - name: Assets Precompile
+          commands:
+            - bundle exec rake assets:precompile
+
+  - name: "Deploy to Heroku"
+    task:
+      secrets:
+        - name: backerkit-clone-secrets
+      jobs:
+        - name: Deploy
+          commands:
+            - checkout
+            - sem-version ruby 3.3.1
+            - curl https://cli-assets.heroku.com/install.sh | sh
+            - ssh-keyscan -H heroku.com >> ~/.ssh/known_hosts
+            - git config --global user.name "Semaphore CI"
+            - git config --global user.email "ci@semaphore.com"
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/backerkit-clone.git $SEMAPHORE_GIT_BRANCH:main
+      when:
+        - branch = 'main' # Only deploy when on the main branch
