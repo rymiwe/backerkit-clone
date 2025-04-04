@@ -9,22 +9,27 @@ blocks:
     task:
       secrets:
         - name: backerkit-clone-secrets
+      env_vars:
+        - name: APP_NAME
+          value: backerkit-clone
       jobs:
         - name: Deploy to Heroku
           commands:
             - checkout
             - sem-version ruby 3.3.1
             - curl https://cli-assets.heroku.com/install.sh | sh
-            - echo "machine api.heroku.com" > ~/.netrc
-            - echo "  login ci@semaphore.com" >> ~/.netrc
-            - echo "  password $HEROKU_API_KEY" >> ~/.netrc
-            - echo "machine git.heroku.com" >> ~/.netrc
-            - echo "  login ci@semaphore.com" >> ~/.netrc
-            - echo "  password $HEROKU_API_KEY" >> ~/.netrc
-            - chmod 600 ~/.netrc
+            - heroku --version
+            # Set up Heroku auth without .netrc to avoid issues
+            - export HEROKU_API_KEY=$HEROKU_API_KEY
+            - echo "Logging in to Heroku Container Registry..."
+            - heroku container:login
             - git config --global user.name "Semaphore CI"
             - git config --global user.email "ci@semaphore.com"
-            # Try a simpler approach - direct API deployment
-            - heroku apps:info -a backerkit-clone
-            # Force push to master to avoid conflicts
-            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/backerkit-clone.git +HEAD:refs/heads/master
+            # Deploy with Heroku API directly
+            - echo "Deploying to $APP_NAME..."
+            # Create a deployment using Heroku CLI API
+            - heroku authorizations:create --description="Semaphore CI"
+            - heroku apps:info -a $APP_NAME
+            # Deploy the app using the Heroku CLI directly with the API key
+            - heroku git:remote -a $APP_NAME
+            - git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git HEAD:refs/heads/main
