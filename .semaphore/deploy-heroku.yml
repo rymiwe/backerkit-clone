@@ -15,14 +15,12 @@ blocks:
             - checkout
             - sem-version ruby 3.3.1
             - curl https://cli-assets.heroku.com/install.sh | sh
-            - cat > ~/.netrc << EOF
-              machine api.heroku.com
-                login ci@semaphore.com
-                password $HEROKU_API_KEY
-              machine git.heroku.com
-                login ci@semaphore.com
-                password $HEROKU_API_KEY
-              EOF
+            - echo "machine api.heroku.com" > ~/.netrc
+            - echo "  login ci@semaphore.com" >> ~/.netrc
+            - echo "  password $HEROKU_API_KEY" >> ~/.netrc
+            - echo "machine git.heroku.com" >> ~/.netrc
+            - echo "  login ci@semaphore.com" >> ~/.netrc
+            - echo "  password $HEROKU_API_KEY" >> ~/.netrc
             - chmod 600 ~/.netrc
             - git config --global user.name "Semaphore CI"
             - git config --global user.email "ci@semaphore.com"
