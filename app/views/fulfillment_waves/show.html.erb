@@ -271,47 +271,48 @@
                               </p>
                             </div>
                             
-                            <div class="mt-4 max-h-60 overflow-y-auto">
-                              <%= form_with url: "/projects/#{@project.id}/bulk_update_item_fulfillments", method: :post, class: "space-y-4" do |form| %>
-                                <%= form.hidden_field :reward_item_id, value: wave_item.reward_item.id %>
-                                
-                                <div class="mb-2 flex items-center justify-between">
-                                  <div>
-                                    <button type="button" class="text-xs text-indigo-600 select-all-btn">Select All</button>
-                                    <button type="button" class="text-xs text-indigo-600 ml-2 clear-all-btn">Clear All</button>
-                                  </div>
-                                  <div>
-                                    <%= form.select :shipped, [['Mark as Shipped', true], ['Mark as Not Shipped', false]], {}, class: "text-sm rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
-                                  </div>
-                                </div>
-                                
-                                <div class="border rounded-md divide-y">
-                                  <% wave_item.reward_item.reward.pledges.each do |pledge| %>
-                                    <div class="p-3 flex items-center justify-between">
-                                      <div class="flex items-center">
-                                        <%= form.check_box "backer_ids[]", { class: "backer-checkbox h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" }, pledge.id, nil %>
-                                        <label class="ml-3 text-sm text-gray-700">
-                                          <%= pledge.backer.name %>
-                                          <span class="text-xs text-gray-500 block">
-                                            Pledged: <%= number_to_currency(pledge.amount) %>
-                                          </span>
-                                        </label>
-                                      </div>
-                                      <div>
-                                        <% fulfillment = BackerItemFulfillment.find_by(pledge: pledge, reward_item: wave_item.reward_item) %>
-                                        <% if fulfillment&.shipped %>
-                                          <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Shipped</span>
-                                        <% else %>
-                                          <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Not Shipped</span>
-                                        <% end %>
-                                      </div>
+                            <div class="mt-10">
+                              <% backers = wave_item.reward_item.reward.pledges %>
+                              <% if backers.any? %>
+                                <%= form_with(url: update_backer_fulfillments_wave_item_path(wave_item), method: :patch, class: "space-y-4", data: { controller: "backer-selection" }) do |form| %>
+                                  <div class="flex justify-between mb-3">
+                                    <h4 class="font-medium">Select backers to mark as shipped:</h4>
+                                    <div class="space-x-2">
+                                      <button class="text-xs text-indigo-600 hover:text-indigo-900" 
+                                              data-action="backer-selection#selectAll">Select All</button>
+                                      <button class="text-xs text-indigo-600 hover:text-indigo-900"
+                                              data-action="backer-selection#clearAll">Clear All</button>
                                     </div>
-                                  <% end %>
-                                </div>
-                                
-                                <div class="mt-4">
-                                  <%= form.submit "Update Selected Backers", class: "w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm" %>
-                                </div>
+                                  </div>
+                                  
+                                  <div class="max-h-60 overflow-y-auto">
+                                    <% backers.each do |pledge| %>
+                                      <div class="flex justify-between py-2 border-b last:border-b-0 items-center">
+                                        <div class="flex items-center">
+                                          <input type="checkbox" name="backer_ids[]" value="<%= pledge.id %>" class="backer-checkbox" data-backer-selection-target="checkbox">
+                                          <label class="ml-3 text-sm text-gray-700">
+                                            <%= pledge.backer.name %>
+                                            <span class="text-xs text-gray-500 block">
+                                              Pledged: <%= number_to_currency(pledge.amount) %>
+                                            </span>
+                                          </label>
+                                        </div>
+                                        <div>
+                                          <% fulfillment = BackerItemFulfillment.find_by(pledge: pledge, reward_item: wave_item.reward_item) %>
+                                          <% if fulfillment&.shipped %>
+                                            <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Shipped</span>
+                                          <% else %>
+                                            <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Not Shipped</span>
+                                          <% end %>
+                                        </div>
+                                      </div>
+                                    <% end %>
+                                  </div>
+                                  
+                                  <div class="mt-4">
+                                    <%= form.submit "Update Selected Backers", class: "w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-indigo-600 text-base font-medium text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm" %>
+                                  </div>
+                                <% end %>
                               <% end %>
                             </div>
                           </div>
@@ -338,39 +339,3 @@
     <%= link_to "Back to Fulfillment Waves", "/projects/#{@project.id}/fulfillment_waves", class: "text-indigo-600 hover:text-indigo-800" %>
   </div>
 </div>
-
-<script>
-  function toggleModal(modalId) {
-    const modal = document.getElementById(modalId);
-    if (modal.classList.contains('hidden')) {
-      modal.classList.remove('hidden');
-    } else {
-      modal.classList.add('hidden');
-    }
-  }
-  
-  document.addEventListener('DOMContentLoaded', function() {
-    const selectAllBtns = document.querySelectorAll('.select-all-btn');
-    const clearAllBtns = document.querySelectorAll('.clear-all-btn');
-    
-    selectAllBtns.forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const checkboxes = this.closest('form').querySelectorAll('.backer-checkbox');
-        checkboxes.forEach(cb => {
-          cb.checked = true;
-        });
-      });
-    });
-    
-    clearAllBtns.forEach(btn => {
-      btn.addEventListener('click', function(e) {
-        e.preventDefault();
-        const checkboxes = this.closest('form').querySelectorAll('.backer-checkbox');
-        checkboxes.forEach(cb => {
-          cb.checked = false;
-        });
-      });
-    });
-  });
-</script>

@@ -60,9 +60,10 @@
                   <span class="font-medium"><%= reward.backers_count %></span>
                 </td>
                 <td class="px-6 py-4">
-                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-<%= reward.status_color %>-100 text-<%= reward.status_color %>-800">
-                    <%= reward.status_name %>
-                  </span>
+                  <div class="flex items-center space-x-2">
+                    <span class="mr-1 font-medium">Status:</span>
+                    <%= render(RewardItem::StatusBadgeComponent.new(status: reward.status)) %>
+                  </div>
                 </td>
                 <td class="px-6 py-4 w-64">
                   <div class="flex items-center">

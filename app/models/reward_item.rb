@@ -34,25 +34,6 @@ class RewardItem < ApplicationRecord
     end
   end
   
-  def status_badge_class
-    case status
-    when "ready"
-      "bg-green-100 text-green-800"
-    when "in_progress"
-      "bg-yellow-100 text-yellow-800"
-    else
-      "bg-gray-100 text-gray-800"
-    end
-  end
-  
-  def status_name
-    case status
-    when "ready" then "Ready"
-    when "in_progress" then "In Progress"
-    else "Not Started"
-    end
-  end
-  
   # New methods for tracking individual backer fulfillment
   def fulfilled_for_backer?(pledge)
     backer_item_fulfillments.where(pledge: pledge, shipped: true).exists?

@@ -183,9 +183,8 @@
                       </div>
                     </td>
                     <td class="px-4 py-2 text-center">
-                      <%= render(Ui::StatusBadgeComponent.new(
-                        status: item.status_name.underscore,
-                        text: item.status_name
+                      <%= render(RewardItem::StatusBadgeComponent.new(
+                        status: item.status
                       )) %>
                     </td>
                     <td class="px-4 py-2 text-center text-xs">

@@ -137,9 +137,9 @@
             <div class="mb-4">
               <div class="flex items-center justify-between mb-1">
                 <span class="text-sm font-medium text-gray-700">Fulfillment Status</span>
-                <span class="text-xs font-medium <%= reward.status == 'completed' ? 'text-green-700' : 'text-gray-500' %>">
-                  <%= reward.status_name %>
-                </span>
+                <div class="text-xs font-medium">
+                  <%= render(RewardItem::StatusBadgeComponent.new(status: reward.status)) %>
+                </div>
               </div>
               <div class="w-full bg-gray-200 rounded-full h-2">
                 <div class="bg-<%= reward.status_color %>-600 h-2 rounded-full" style="width: <%= reward.fulfillment_progress %>%"></div>
