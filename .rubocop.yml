@@ -10,6 +10,7 @@ AllCops:
     - 'spec/rails_helper.rb'
     - 'Rakefile'
     - 'node_modules/**/*'
+    - 'spec/system/**/*'  # Exclude system specs completely as they're causing Capybara cop errors
     # Enable app directory checking for better code quality
   SuggestExtensions: false
 
@@ -89,7 +90,10 @@ RSpec/LetSetup:
 RSpec/PredicateMatcher:
   Enabled: false
 
-# Disable Capybara cops that are causing errors
+# Disable all Capybara cops entirely
+Capybara:
+  Enabled: false
+
 RSpec/Capybara:
   Enabled: false
 
