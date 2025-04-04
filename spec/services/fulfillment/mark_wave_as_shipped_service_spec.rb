@@ -1,7 +1,13 @@
 require 'rails_helper'
 
 RSpec.describe Fulfillment::MarkWaveAsShippedService do
-  let(:creator) { create(:user) }
+  # Create a user with the creator role
+  let(:creator) do 
+    user = create(:user)
+    user.make_creator # Add the creator role
+    user
+  end
+  
   let(:project) { create(:project, creator: creator) }
   let(:backer) { create(:user) }
   let(:reward) { create(:reward, project: project) }
