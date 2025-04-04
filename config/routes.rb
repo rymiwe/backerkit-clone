@@ -62,6 +62,7 @@ Rails.application.routes.draw do
   get '/dashboard', to: 'dashboard#index'
   get '/dashboard/backed_projects', to: 'dashboard#backed_projects', as: 'backed_projects_dashboard'
   get '/dashboard/created_projects', to: 'dashboard#created_projects', as: 'created_projects_dashboard'
+  post '/dashboard/set_active_tab', to: 'dashboard#set_active_tab', as: 'dashboard_set_active_tab'
   
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   get "up" => "rails/health#show", as: :rails_health_check

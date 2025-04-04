@@ -14,6 +14,15 @@ class DashboardController < ApplicationController
     # Project funding stats for created projects
     @total_funding_received = @created_projects.sum { |p| p.pledges.sum(:amount) }
     @avg_funding_percentage = @created_projects.any? ? (@created_projects.sum { |p| p.funded_percentage } / @created_projects.count.to_f).round : 0
+    
+    # Handle active tab persistence
+    if params[:active_tab].present?
+      # Store the active tab in session if it's provided in params
+      session[:dashboard_active_tab] = params[:active_tab]
+    end
+    
+    # Set active tab from session, defaulting to 'backed' if not set
+    @active_tab = session[:dashboard_active_tab] || 'backed'
   end
   
   def backed_projects
@@ -22,5 +31,11 @@ class DashboardController < ApplicationController
   
   def created_projects
     @created_projects = current_user.projects.includes(:pledges).order(created_at: :desc)
+  end
+  
+  # Store the active tab and redirect back
+  def set_active_tab
+    session[:dashboard_active_tab] = params[:tab]
+    redirect_to dashboard_path
   end
 end

@@ -50,13 +50,19 @@
   <div class="mb-8">
     <div class="border-b border-gray-200">
       <nav class="-mb-px flex space-x-8">
-        <a href="#backed" class="border-indigo-500 text-indigo-600 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm" aria-current="page">
+        <a href="#backed" 
+          data-tab="backed"
+          class="tab-link <%= @active_tab == 'backed' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
           Projects I've Backed
         </a>
-        <a href="#created" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
+        <a href="#created" 
+          data-tab="created"
+          class="tab-link <%= @active_tab == 'created' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
           Projects I've Created
         </a>
-        <a href="#pledges" class="border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
+        <a href="#pledges" 
+          data-tab="pledges"
+          class="tab-link <%= @active_tab == 'pledges' ? 'border-indigo-500 text-indigo-600' : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300' %> whitespace-nowrap pb-4 px-1 border-b-2 font-medium text-sm">
           Recent Pledges
         </a>
       </nav>
@@ -64,7 +70,7 @@
   </div>
   
   <!-- Backed Projects Section -->
-  <div id="backed" class="mb-12">
+  <div id="backed" class="tab-content mb-12 <%= @active_tab == 'backed' ? '' : 'hidden' %>">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-gray-900">Projects I've Backed</h2>
       <%= link_to "View All", backed_projects_dashboard_path, class: "text-indigo-600 hover:text-indigo-800" %>
@@ -136,7 +142,7 @@
   </div>
   
   <!-- Created Projects Section -->
-  <div id="created" class="mb-12 hidden">
+  <div id="created" class="tab-content mb-12 <%= @active_tab == 'created' ? '' : 'hidden' %>">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-gray-900">Projects I've Created</h2>
       <%= link_to "View All", created_projects_dashboard_path, class: "text-indigo-600 hover:text-indigo-800" %>
@@ -219,7 +225,7 @@
   </div>
   
   <!-- Recent Pledges Section -->
-  <div id="pledges" class="mb-12 hidden">
+  <div id="pledges" class="tab-content mb-12 <%= @active_tab == 'pledges' ? '' : 'hidden' %>">
     <div class="flex justify-between items-center mb-6">
       <h2 class="text-2xl font-bold text-gray-900">Recent Pledges</h2>
       <%= link_to "View All", pledges_path, class: "text-indigo-600 hover:text-indigo-800" %>
@@ -299,17 +305,23 @@
   </div>
 </div>
 
+<%= form_with url: dashboard_set_active_tab_path, method: :post, id: 'active_tab_form' do |f| %>
+  <%= f.hidden_field :tab, id: 'active_tab_input' %>
+<% end %>
+
 <script>
   document.addEventListener('DOMContentLoaded', function() {
-    const tabs = document.querySelectorAll('nav a');
-    const sections = document.querySelectorAll('#backed, #created, #pledges');
-    
-    // Show the first tab by default
-    sections[0].classList.remove('hidden');
+    const tabs = document.querySelectorAll('.tab-link');
+    const sections = document.querySelectorAll('.tab-content');
+    const form = document.getElementById('active_tab_form');
+    const tabInput = document.getElementById('active_tab_input');
     
     tabs.forEach((tab, index) => {
       tab.addEventListener('click', function(e) {
         e.preventDefault();
+        
+        // Get the tab id from data attribute
+        const tabId = this.getAttribute('data-tab');
         
         // Hide all sections
         sections.forEach(section => {
@@ -323,12 +335,17 @@
         });
         
         // Show the selected section
-        const targetId = this.getAttribute('href').substring(1);
-        document.getElementById(targetId).classList.remove('hidden');
+        document.getElementById(tabId).classList.remove('hidden');
         
         // Add active class to the clicked tab
         this.classList.remove('border-transparent', 'text-gray-500', 'hover:text-gray-700', 'hover:border-gray-300');
         this.classList.add('border-indigo-500', 'text-indigo-600');
+        
+        // Update hidden form field with selected tab
+        tabInput.value = tabId;
+        
+        // Submit the form to update the session variable
+        form.submit();
       });
     });
   });
