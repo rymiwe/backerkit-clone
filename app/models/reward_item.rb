@@ -68,15 +68,19 @@ class RewardItem < ApplicationRecord
   private
   
   def calculate_total_needed
-    return if total_needed.present? && total_needed > 0 && !reward_id_changed? && !quantity_per_reward_changed?
-    
-    backer_count = reward.pledges.count
-    self.total_needed = backer_count * quantity_per_reward
+    # If explicitly set to 0, we want to recalculate it
+    # This supports the test case where total_needed is explicitly set to 0
+    if total_needed == 0 || total_needed.nil? || reward_id_changed? || quantity_per_reward_changed?
+      backer_count = reward.pledges.count
+      self.total_needed = backer_count * quantity_per_reward
+    end
   end
   
   def needs_total_calculation?
+    return true if reward.present? && quantity_per_reward.present? && total_needed == 0
+    
     reward.present? && quantity_per_reward.present? && 
-    (total_needed.nil? || (total_needed == 0 && !self.persisted?))
+    (total_needed.nil? || total_needed < 1) && !persisted?
   end
   
   def set_default_priority
