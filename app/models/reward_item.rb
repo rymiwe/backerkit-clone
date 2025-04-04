@@ -11,7 +11,7 @@ class RewardItem < ApplicationRecord
   validates :total_needed, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :produced_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :shipped_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
-  validates :name, uniqueness: { scope: :reward_id, message: "must be unique within a reward" }
+  validates :name, uniqueness: { scope: :reward_id, message: "must be unique within this reward" }
   validates_with ShippingCountValidator
   
   before_validation :calculate_total_needed, if: :needs_total_calculation?
@@ -24,8 +24,8 @@ class RewardItem < ApplicationRecord
   end
   
   def shipping_percentage
-    return 0 if total_needed.zero?
-    [(shipped_count.to_f / total_needed * 100).round, 100].min
+    return 0 if produced_count.zero?
+    [(shipped_count.to_f / produced_count * 100).round, 100].min
   end
   
   # Added to support tests expecting needed_count method
@@ -76,7 +76,7 @@ class RewardItem < ApplicationRecord
   
   def needs_total_calculation?
     reward.present? && quantity_per_reward.present? && 
-    (total_needed.nil? || (total_needed.zero? && !self.persisted?))
+    (total_needed.nil? || (total_needed == 0 && !self.persisted?))
   end
   
   def set_default_priority

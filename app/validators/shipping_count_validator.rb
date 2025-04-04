@@ -10,7 +10,7 @@ class ShippingCountValidator < ActiveModel::Validator
     # IMPORTANT: Even in test environment, we always validate that shipped_count can't exceed produced_count
     # This is a critical business rule that should always be enforced
     if record.shipped_count.to_i > record.produced_count.to_i
-      record.errors.add(:shipped_count, "cannot exceed the produced count (#{record.produced_count})")
+      record.errors.add(:shipped_count, "cannot exceed produced count")
     end
 
     # Skip remaining validations during seed process if environment variable is set
