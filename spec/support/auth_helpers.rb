@@ -5,7 +5,7 @@ module AuthHelpers
   end
   
   # Simulates signing out in controller tests
-  def sign_out
+  def sign_out(_scope = nil)
     session[:user_id] = nil
   end
 end
