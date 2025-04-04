@@ -47,8 +47,12 @@ class RewardsController < ApplicationController
 
   # DELETE /projects/:project_id/rewards/:id
   def destroy
-    @reward.destroy
-    redirect_to project_path(@project), notice: 'Reward was successfully removed.'
+    if @reward.pledges.any?
+      redirect_to project_path(@project), alert: 'Cannot delete reward with pledges.'
+    else
+      @reward.destroy
+      redirect_to project_path(@project), notice: 'Reward was successfully removed.'
+    end
   end
 
   def fulfillment
@@ -88,7 +92,7 @@ class RewardsController < ApplicationController
 
     # Only allow a list of trusted parameters through
     def reward_params
-      params.require(:reward).permit(:title, :description, :amount, :estimated_delivery, :shipping_address_required, :limited_quantity, :quantity)
+      params.require(:reward).permit(:title, :description, :amount, :estimated_shipping_date, :status, :fulfillment_progress)
     end
     
     def success_redirect_path

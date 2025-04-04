@@ -5,8 +5,12 @@
       <p class="text-gray-600">Manage reward fulfillment for <%= @project.title %></p>
     </div>
     <div class="flex space-x-2">
-      <%= link_to "Fulfillment Waves", project_fulfillment_waves_path(@project), class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
-      <%= link_to "Back to Project", project_path(@project), class: "px-4 py-2 bg-gray-100 rounded-md text-gray-800 hover:bg-gray-200" %>
+      <%= link_to "/projects/#{@project.id}/fulfillment_waves", class: "px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" do %>
+        Fulfillment Waves
+      <% end %>
+      <%= link_to "/projects/#{@project.id}", class: "px-4 py-2 bg-gray-100 rounded-md text-gray-800 hover:bg-gray-200" do %>
+        Back to Project
+      <% end %>
     </div>
   </div>
   
@@ -40,7 +44,7 @@
       <h2 class="text-xl font-semibold">Production Priorities</h2>
       
       <div class="flex space-x-2">
-        <%= link_to new_project_fulfillment_wave_path(@project), class: "inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800" do %>
+        <%= link_to "/projects/#{@project.id}/fulfillment_waves/new", class: "inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800" do %>
           <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
           </svg>
@@ -118,7 +122,7 @@
           <div class="flex justify-between items-center mb-4">
             <h3 class="text-lg font-medium">Item Production Tracking</h3>
             <div class="flex space-x-2">
-              <%= link_to project_generate_fulfillments_path(@project, reward.id), method: :post, class: "inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800 mr-2" do %>
+              <%= link_to "/projects/#{@project.id}/generate_fulfillments/#{reward.id}", method: :post, class: "inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800 mr-2" do %>
                 <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
@@ -220,7 +224,7 @@
                             </svg>
                           </button>
                           
-                          <%= link_to project_reward_reward_item_path(@project, reward, item), method: :delete, 
+                          <%= link_to "/projects/#{@project.id}/rewards/#{reward.id}/reward_items/#{item.id}", method: :delete, 
                                         class: "text-red-600 hover:text-red-900",
                                         form: { data: { turbo_confirm: "Are you sure? This cannot be undone." } } %>
                                 <span class="sr-only">Delete</span>
@@ -244,7 +248,7 @@
                           </button>
                         </div>
                         
-                        <%= form_with url: project_fulfillment_dashboard_update_item_counts_path(@project), method: :patch do |f| %>
+                        <%= form_with url: "/projects/#{@project.id}/fulfillment_dashboard/update_item_counts", method: :patch do |f| %>
                           <%= f.hidden_field :reward_id, value: reward.id %>
                           <%= f.hidden_field :item_id, value: item.id %>
                           
@@ -307,7 +311,7 @@
                           </div>
                         </div>
                         
-                        <%= form_with url: project_bulk_update_item_fulfillments_path(@project), method: :post do |f| %>
+                        <%= form_with url: "/projects/#{@project.id}/bulk_update_item_fulfillments", method: :post do |f| %>
                           <%= f.hidden_field :reward_item_id, value: item.id %>
                           
                           <div class="mb-4 flex items-center justify-between">
@@ -406,7 +410,7 @@
                 </button>
               </div>
               
-              <%= form_with url: project_reward_reward_items_path(@project, reward), method: :post do |f| %>
+              <%= form_with url: "/projects/#{@project.id}/rewards/#{reward.id}/reward_items", method: :post do |f| %>
                 <div class="space-y-4">
                   <div>
                     <label class="block text-sm font-medium text-gray-700 mb-1">Item Name</label>

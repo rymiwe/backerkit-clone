@@ -2,6 +2,7 @@ class Project < ApplicationRecord
   belongs_to :creator, class_name: 'User'
   has_many :rewards, dependent: :destroy
   has_many :pledges, dependent: :destroy
+  has_many :fulfillment_waves, class_name: 'FulfillmentWave', dependent: :destroy
   
   validates :title, presence: true
   validates :description, presence: true
