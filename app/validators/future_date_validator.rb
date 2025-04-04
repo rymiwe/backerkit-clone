@@ -4,10 +4,10 @@
 # This ensures better validation messaging for date fields
 class FutureDateValidator < ActiveModel::EachValidator
   def validate_each(record, attribute, value)
-    return unless value.present?
-    
-    if value <= Date.current
-      record.errors.add(attribute, options[:message] || "must be a future date")
-    end
+    return if value.blank?
+
+    return unless value <= Date.current
+
+    record.errors.add(attribute, options[:message] || "must be a future date")
   end
 end

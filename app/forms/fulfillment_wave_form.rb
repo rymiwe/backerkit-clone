@@ -5,7 +5,7 @@
 class FulfillmentWaveForm
   include ActiveModel::Model
   include ActiveModel::Attributes
-  
+
   # Define attributes with types
   attribute :name, :string
   attribute :description, :string
@@ -14,13 +14,13 @@ class FulfillmentWaveForm
   attribute :status, :string
   attribute :item_ids, default: []
   attribute :quantity_map, default: {}
-  
+
   # Validations
   validates :name, :project_id, :target_ship_date, :status, presence: true
   validates :target_ship_date, future_date: true, if: -> { target_ship_date.present? }
   validates :item_ids, presence: { message: "At least one item must be selected" }
   validate :valid_quantities
-  
+
   # Constructor that can initialize from a FulfillmentWave model
   def initialize(attributes = {})
     if attributes.is_a?(FulfillmentWave)
@@ -36,15 +36,15 @@ class FulfillmentWaveForm
       )
       @wave = wave
     else
-      super(attributes)
+      super
       @wave = nil
     end
   end
-  
+
   # Save the form data to the database
   def save
     return false unless valid?
-    
+
     ActiveRecord::Base.transaction do
       persist!
       true
@@ -53,23 +53,19 @@ class FulfillmentWaveForm
     errors.add(:base, e.message)
     false
   end
-  
+
   # Access the saved wave
-  def wave
-    @wave
-  end
-  
+  attr_reader :wave
+
   private
-  
+
   # Validate that all quantities are positive numbers
   def valid_quantities
     item_ids.each do |item_id|
       quantity = quantity_map[item_id.to_s].to_i
-      
-      if quantity <= 0
-        errors.add(:quantity_map, "Quantity for item ##{item_id} must be greater than zero")
-      end
-      
+
+      errors.add(:quantity_map, "Quantity for item ##{item_id} must be greater than zero") if quantity <= 0
+
       # Check if the quantity exceeds available items
       item = RewardItem.find_by(id: item_id)
       if item && quantity > (item.needed_count - item.shipped_count)
@@ -77,7 +73,7 @@ class FulfillmentWaveForm
       end
     end
   end
-  
+
   # Persist the form data to the database
   def persist!
     if @wave
@@ -85,10 +81,10 @@ class FulfillmentWaveForm
     else
       create_new_wave
     end
-    
+
     @wave
   end
-  
+
   # Create a new fulfillment wave
   def create_new_wave
     @wave = FulfillmentWave.create!(
@@ -98,7 +94,7 @@ class FulfillmentWaveForm
       target_ship_date: target_ship_date,
       status: status
     )
-    
+
     # Create wave items for the selected reward items
     item_ids.each do |item_id|
       quantity = quantity_map[item_id.to_s].to_i
@@ -108,7 +104,7 @@ class FulfillmentWaveForm
       )
     end
   end
-  
+
   # Update an existing fulfillment wave
   def update_existing_wave
     @wave.update!(
@@ -117,14 +113,14 @@ class FulfillmentWaveForm
       target_ship_date: target_ship_date,
       status: status
     )
-    
+
     # Handle wave items updates
     existing_item_ids = @wave.wave_items.pluck(:reward_item_id).map(&:to_s)
-    
+
     # Remove items that are no longer selected
     items_to_remove = existing_item_ids - item_ids
     @wave.wave_items.where(reward_item_id: items_to_remove).destroy_all
-    
+
     # Update or create wave items
     item_ids.each do |item_id|
       quantity = quantity_map[item_id.to_s].to_i
