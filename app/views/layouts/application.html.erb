@@ -45,7 +45,7 @@
               <div class="hidden md:flex md:items-center md:space-x-4 mr-4">
                 <%= link_to "Dashboard", dashboard_path, class: "text-gray-600 hover:text-indigo-600" %>
                 <%= link_to "My Pledges", pledges_path, class: "text-gray-600 hover:text-indigo-600" %>
-                <%= link_to "My Projects", projects_path(creator_id: current_user.id), class: "text-gray-600 hover:text-indigo-600" %>
+                <%= link_to "My Projects", created_projects_dashboard_path, class: "text-gray-600 hover:text-indigo-600" %>
                 <%= link_to "Start a Project", new_project_path, class: "bg-indigo-100 text-indigo-700 hover:bg-indigo-200 px-3 py-1 rounded-md text-sm font-medium" %>
               </div>
               <div class="flex items-center border-l border-gray-200 pl-4">
