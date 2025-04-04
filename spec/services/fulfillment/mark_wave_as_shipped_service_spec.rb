@@ -71,7 +71,7 @@ RSpec.describe Fulfillment::MarkWaveAsShippedService do
     context 'when the user is an admin' do
       let(:admin) do
         user = create(:user)
-        user.add_role('admin')
+        user.make_admin # Use the new public method
         user.save!
         user
       end

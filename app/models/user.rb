@@ -29,6 +29,14 @@ class User < ApplicationRecord
     add_role('backer')
   end
   
+  def make_admin
+    add_role('admin')
+  end
+  
+  def has_role?(role)
+    (roles || []).include?(role.to_s)
+  end
+  
   # Returns the total amount pledged across all projects
   def total_pledged
     pledges.sum(:amount)
@@ -40,10 +48,6 @@ class User < ApplicationRecord
   end
   
   private
-  
-  def has_role?(role)
-    (roles || []).include?(role.to_s)
-  end
   
   def add_role(role)
     self.roles = (roles || []) << role.to_s unless has_role?(role)
