@@ -44,10 +44,15 @@ blocks:
           - RAILS_ENV=test bundle exec rake db:seed
           # Precompile assets for test environment to avoid Tailwind CSS issues
           - RAILS_ENV=test bundle exec rake assets:precompile
+          # Create test reports directory
+          - mkdir -p tmp/test-results/rspec
       jobs:
         - name: RSpec Tests
           commands:
-            - RAILS_ENV=test bundle exec rspec
+            - RAILS_ENV=test bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/test-results/rspec/results.xml
+          artifacts:
+            - name: Test Results
+              path: tmp/test-results/
 
   - name: "Asset Precompilation Check"
     task:

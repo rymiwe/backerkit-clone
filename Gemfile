@@ -64,6 +64,8 @@ group :development, :test do
   gem "rubocop-rails", "~> 2.20", require: false
   gem "rubocop-rspec", "~> 2.22", require: false
   gem "rails-controller-testing"
+  # Use rspec_junit_formatter for Semaphore CI test reports
+  gem "rspec_junit_formatter"
 end
 
 group :development do
@@ -79,9 +81,7 @@ end
 
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
-  gem "capybara"
   gem "selenium-webdriver"
-  gem "shoulda-matchers", "~> 5.0"
 end
 
 # Heroku deployment requirements
