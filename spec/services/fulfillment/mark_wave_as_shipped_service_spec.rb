@@ -6,7 +6,7 @@ RSpec.describe Fulfillment::MarkWaveAsShippedService do
   let(:backer) { create(:user) }
   let(:reward) { create(:reward, project: project) }
   let(:reward_item) { create(:reward_item, reward: reward, quantity_per_reward: 1, produced_count: 10) }
-  let(:pledge) { create(:pledge, user: backer, project: project, reward: reward) }
+  let(:pledge) { create(:pledge, backer: backer, project: project, reward: reward) }
   
   let(:wave) do
     create(:fulfillment_wave, 
@@ -27,6 +27,10 @@ RSpec.describe Fulfillment::MarkWaveAsShippedService do
   subject(:service) { described_class.new(wave, creator) }
 
   describe '#call' do
+    before do
+      pledge # Create the pledge
+    end
+
     context 'when the user is the project creator' do
       it 'returns true on successful completion' do
         expect(service.call).to be true
@@ -52,7 +56,7 @@ RSpec.describe Fulfillment::MarkWaveAsShippedService do
     end
 
     context 'when the user is an admin' do
-      let(:admin) { create(:user, admin: true) }
+      let(:admin) { create(:user, roles: ['admin']) }
       subject(:service) { described_class.new(wave, admin) }
 
       it 'allows admins to mark waves as shipped' do
@@ -120,8 +124,8 @@ RSpec.describe Fulfillment::MarkWaveAsShippedService do
     context 'with multiple pledges and reward items' do
       let(:backer2) { create(:user) }
       let(:backer3) { create(:user) }
-      let(:pledge2) { create(:pledge, user: backer2, project: project, reward: reward) }
-      let(:pledge3) { create(:pledge, user: backer3, project: project, reward: reward) }
+      let(:pledge2) { create(:pledge, backer: backer2, project: project, reward: reward) }
+      let(:pledge3) { create(:pledge, backer: backer3, project: project, reward: reward) }
       
       let(:reward_item2) { create(:reward_item, reward: reward, quantity_per_reward: 1, produced_count: 15) }
       
