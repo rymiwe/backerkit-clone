@@ -10,7 +10,7 @@ AllCops:
     - 'spec/rails_helper.rb'
     - 'Rakefile'
     - 'node_modules/**/*'
-    - 'app/**/*'  # Temporarily exclude app directory
+    # Enable app directory checking for better code quality
 
 Style/Documentation:
   Enabled: false

@@ -28,8 +28,7 @@ blocks:
       jobs:
         - name: Rubocop
           commands:
-            - echo "Skipping Rubocop for now"
-            # - bundle exec rubocop
+            - bundle exec rubocop
 
   - name: "Tests"
     task:
