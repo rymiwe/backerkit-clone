@@ -5,6 +5,7 @@ RSpec.describe Fulfillment::MarkWaveAsShippedService do
   let(:creator) do 
     user = create(:user)
     user.make_creator # Add the creator role
+    user.save! # Save the user to persist the role
     user
   end
   
@@ -35,6 +36,12 @@ RSpec.describe Fulfillment::MarkWaveAsShippedService do
   describe '#call' do
     before do
       pledge # Create the pledge
+      
+      # Debug roles
+      puts "Creator has roles: #{creator.roles.inspect}"
+      puts "Project creator is: #{project.creator.id}, User is: #{creator.id}"
+      puts "Project creator is the same as creator: #{project.creator == creator}"
+      puts "Creator has creator role: #{creator.is_creator?}"
     end
 
     context 'when the user is the project creator' do
@@ -62,8 +69,18 @@ RSpec.describe Fulfillment::MarkWaveAsShippedService do
     end
 
     context 'when the user is an admin' do
-      let(:admin) { create(:user, roles: ['admin']) }
+      let(:admin) do
+        user = create(:user)
+        user.add_role('admin')
+        user.save!
+        user
+      end
       subject(:service) { described_class.new(wave, admin) }
+
+      before do
+        puts "Admin has roles: #{admin.roles.inspect}"
+        puts "Admin has admin role: #{admin.has_role?('admin')}"
+      end
 
       it 'allows admins to mark waves as shipped' do
         expect(service.call).to be true
