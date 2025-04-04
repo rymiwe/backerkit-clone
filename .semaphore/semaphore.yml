@@ -40,6 +40,7 @@ blocks:
           - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
           - bundle install --path vendor/bundle
           - sem-service start postgres
+          - cp config/database.semaphore.yml config/database.yml
           - bundle exec rake db:setup
       jobs:
         - name: RSpec Tests

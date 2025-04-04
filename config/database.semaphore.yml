@@ -1,0 +1,8 @@
+test:
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  database: backerkit_clone_test
+  username: postgres
+  password: 
+  host: localhost
