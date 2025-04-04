@@ -3,7 +3,7 @@ class RewardItem < ApplicationRecord
   
   belongs_to :reward
   has_many :wave_items, dependent: :destroy
-  has_many :fulfillment_waves, through: :wave_items
+  has_many :fulfillment_waves, through: :wave_items, source: :fulfillment_wave
   has_many :backer_item_fulfillments, dependent: :destroy
   
   validates :name, presence: true
@@ -15,6 +15,8 @@ class RewardItem < ApplicationRecord
   validates_with ShippingCountValidator
   
   before_validation :calculate_total_needed, if: :needs_total_calculation?
+  
+  after_initialize :set_default_priority, if: :new_record?
   
   def production_percentage
     return 0 if total_needed.zero?
@@ -66,12 +68,18 @@ class RewardItem < ApplicationRecord
   private
   
   def calculate_total_needed
+    return if total_needed.present? && total_needed > 0 && !reward_id_changed? && !quantity_per_reward_changed?
+    
     backer_count = reward.pledges.count
     self.total_needed = backer_count * quantity_per_reward
   end
   
   def needs_total_calculation?
     reward.present? && quantity_per_reward.present? && 
-    (total_needed.nil? || total_needed.zero? || reward_id_changed? || quantity_per_reward_changed?)
+    (total_needed.nil? || (total_needed.zero? && !self.persisted?))
+  end
+  
+  def set_default_priority
+    self.production_priority ||= 1
   end
 end

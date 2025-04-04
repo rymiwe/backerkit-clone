@@ -2,8 +2,8 @@ require 'rails_helper'
 
 RSpec.describe BackerItemFulfillment do
   describe "associations" do
-    it { is_expected.to belong_to(:pledge) }
-    it { is_expected.to belong_to(:reward_item) }
+    it { should belong_to(:pledge) }
+    it { should belong_to(:reward_item) }
   end
 
   describe "validations" do
@@ -14,7 +14,7 @@ RSpec.describe BackerItemFulfillment do
 
       duplicate = build(:backer_item_fulfillment, pledge: pledge, reward_item: reward_item)
       expect(duplicate).not_to be_valid
-      expect(duplicate.errors[:reward_item_id]).to include(/has already been taken/)
+      expect(duplicate.errors[:pledge_id]).to include("already has a fulfillment record for this item")
     end
   end
 
@@ -32,7 +32,7 @@ RSpec.describe BackerItemFulfillment do
       expect(reward_item.shipped_count).to eq(0)
 
       # Update to shipped
-      fulfillment.update(shipped: true)
+      fulfillment.update(shipped: true, shipped_at: Time.current)
       reward_item.reload
 
       # Should increment shipped count
@@ -41,7 +41,7 @@ RSpec.describe BackerItemFulfillment do
 
     it "decrements reward_item shipped count when unmarked as shipped" do
       # Create a fulfillment marked as shipped
-      fulfillment = create(:backer_item_fulfillment, pledge: pledge, reward_item: reward_item, shipped: true)
+      fulfillment = create(:backer_item_fulfillment, pledge: pledge, reward_item: reward_item, shipped: true, shipped_at: Time.current)
 
       # Verify initial shipped count after creating shipped fulfillment
       reward_item.reload
@@ -80,6 +80,7 @@ RSpec.describe BackerItemFulfillment do
                            shipped: true,
                            tracking_number: tracking_number,
                            tracking_url: tracking_url,
+                           shipped_at: Time.current,
                            notes: notes)
 
       found_fulfillment = described_class.find(fulfillment.id)
@@ -97,7 +98,7 @@ RSpec.describe BackerItemFulfillment do
                            tracking_number: nil)
 
       new_tracking = "UPDATED456"
-      expect(fulfillment.update(shipped: true, tracking_number: new_tracking)).to be true
+      expect(fulfillment.update(shipped: true, shipped_at: Time.current, tracking_number: new_tracking)).to be true
       fulfillment.reload
 
       expect(fulfillment.shipped).to be(true)
@@ -118,8 +119,10 @@ RSpec.describe BackerItemFulfillment do
 
     before do
       # Create 5 pledges and corresponding fulfillments
-      5.times do |_i|
-        pledge = create(:pledge, project: project, reward: reward)
+      5.times do |i|
+        # Create unique backers for each pledge
+        backer = create(:user, name: "Backer #{i}", email: "backer#{i}@example.com")
+        pledge = create(:pledge, project: project, reward: reward, backer: backer)
         create(:backer_item_fulfillment, pledge: pledge, reward_item: reward_item, shipped: false)
       end
     end
@@ -128,15 +131,17 @@ RSpec.describe BackerItemFulfillment do
       fulfillments = described_class.where(reward_item: reward_item)
       expect(fulfillments.count).to eq(5)
 
-      # Mark all as shipped
-      fulfillments.update_all(shipped: true)
+      # Mark all as shipped with shipped_at timestamp
+      fulfillments.each do |f|
+        f.update(shipped: true, shipped_at: Time.current)
+      end
 
       # Check all are now shipped
       expect(described_class.where(reward_item: reward_item, shipped: true).count).to eq(5)
-
-      # This should have updated the reward_item shipped count, but our test environment
-      # won't trigger the callbacks when using update_all, so we'd need a service method
-      # to properly handle this in production code
+      
+      # Check reward_item shipped count increased
+      reward_item.reload
+      expect(reward_item.shipped_count).to eq(5)
     end
   end
 end

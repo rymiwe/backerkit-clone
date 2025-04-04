@@ -2,15 +2,15 @@ require 'rails_helper'
 
 RSpec.describe FulfillmentWave do
   describe "associations" do
-    it { is_expected.to belong_to(:project) }
-    it { is_expected.to have_many(:wave_items).dependent(:destroy) }
-    it { is_expected.to have_many(:reward_items).through(:wave_items) }
+    it { should belong_to(:project) }
+    it { should have_many(:wave_items).dependent(:destroy) }
+    it { should have_many(:reward_items).through(:wave_items) }
   end
 
   describe "validations" do
-    it { is_expected.to validate_presence_of(:name) }
-    it { is_expected.to validate_presence_of(:target_ship_date) }
-    it { is_expected.to validate_presence_of(:status) }
+    it { should validate_presence_of(:name) }
+    it { should validate_presence_of(:target_ship_date) }
+    it { should validate_presence_of(:status) }
 
     it "defines status enum values" do
       expect(described_class.statuses.keys).to include(
@@ -46,21 +46,21 @@ RSpec.describe FulfillmentWave do
     let(:project) { create(:project) }
     let(:reward) { create(:reward, project: project) }
     let(:reward_item) { create(:reward_item, reward: reward) }
-    let(:backer) { create(:user) }
     let(:wave) { create(:fulfillment_wave, project: project) }
-
+    
     before do
-      # Create pledges and fulfillments for proper progress calculation
-      pledge = create(:pledge, reward: reward, backer: backer, project: project)
+      # Create a wave item for the test
       create(:wave_item, fulfillment_wave: wave, reward_item: reward_item, quantity: 10)
-
-      # Create 5 shipping fulfillments to get 50% shipped
-      5.times do
-        create(:backer_item_fulfillment, reward_item: reward_item, pledge: pledge, shipped: true)
-      end
     end
 
     it "calculates progress percentage" do
+      # Create 5 pledges/backers with shipped fulfillments (50% shipped)
+      5.times do |i|
+        backer = create(:user, name: "Backer #{i}", email: "backer#{i}@example.com")
+        pledge = create(:pledge, reward: reward, backer: backer, project: project)
+        create(:backer_item_fulfillment, reward_item: reward_item, pledge: pledge, shipped: true, shipped_at: Time.current)
+      end
+      
       expect(wave.progress_percentage).to be_between(45, 55).inclusive
     end
 
@@ -70,10 +70,11 @@ RSpec.describe FulfillmentWave do
     end
 
     it "caps progress at 100%" do
-      # Create more shipping fulfillments than needed
-      pledge = create(:pledge, reward: reward, backer: create(:user), project: project)
-      15.times do
-        create(:backer_item_fulfillment, reward_item: reward_item, pledge: pledge, shipped: true)
+      # Create 15 pledges/backers with shipped fulfillments (150% of needed quantity)
+      15.times do |i|
+        backer = create(:user, name: "Over Backer #{i}", email: "over_backer#{i}@example.com")
+        pledge = create(:pledge, reward: reward, backer: backer, project: project)
+        create(:backer_item_fulfillment, reward_item: reward_item, pledge: pledge, shipped: true, shipped_at: Time.current)
       end
 
       expect(wave.progress_percentage).to eq(100)

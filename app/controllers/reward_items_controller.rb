@@ -1,8 +1,15 @@
 class RewardItemsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_reward
-  before_action :set_reward_item, only: [:update, :destroy]
+  before_action :set_reward_item, only: [:edit, :update, :destroy]
   before_action :authorize_creator!
+  
+  def new
+    @reward_item = @reward.reward_items.build
+  end
+  
+  def edit
+  end
   
   def create
     @reward_item = @reward.reward_items.build(reward_item_params)
@@ -31,6 +38,14 @@ class RewardItemsController < ApplicationController
   end
 
   def destroy
+    if @reward_item.backer_item_fulfillments.any?
+      respond_to do |format|
+        format.html { redirect_to project_fulfillment_dashboard_path(@reward.project), alert: "Cannot delete item with existing fulfillment records." }
+        format.json { render json: { error: "Cannot delete item with existing fulfillment records" }, status: :unprocessable_entity }
+      end
+      return
+    end
+    
     @reward_item.destroy
     
     respond_to do |format|
@@ -50,7 +65,7 @@ class RewardItemsController < ApplicationController
   end
   
   def reward_item_params
-    params.require(:reward_item).permit(:name, :description, :quantity_per_reward, :produced_count, :shipped_count)
+    params.require(:reward_item).permit(:name, :description, :quantity_per_reward, :produced_count, :shipped_count, :production_priority)
   end
   
   def authorize_creator!

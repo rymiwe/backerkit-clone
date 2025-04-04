@@ -139,13 +139,14 @@ RSpec.describe BackerItemFulfillmentsController do
       end
 
       context "when fulfillment has been shipped" do
-        let!(:shipped_fulfillment) do
-          create(:backer_item_fulfillment, reward_item: reward_item, pledge: pledge, shipped: true)
+        before do
+          # Update the existing fulfillment instead of creating a new one
+          fulfillment.update!(shipped: true, shipped_at: Time.current)
         end
-
+        
         it "does not allow deletion of shipped records" do
           expect do
-            delete :destroy, params: { project_id: project.id, pledge_id: pledge.id, id: shipped_fulfillment.id }
+            delete :destroy, params: { project_id: project.id, pledge_id: pledge.id, id: fulfillment.id }
           end.not_to change(BackerItemFulfillment, :count)
 
           expect(response).to be_redirect

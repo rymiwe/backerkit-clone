@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.1].define(version: 2025_04_03_234212) do
+ActiveRecord::Schema[7.1].define(version: 2025_04_04_162052) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "plpgsql"
 
@@ -22,6 +22,8 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_03_234212) do
     t.text "notes"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "tracking_number"
+    t.string "tracking_url"
     t.index ["pledge_id"], name: "index_backer_item_fulfillments_on_pledge_id"
     t.index ["reward_item_id"], name: "index_backer_item_fulfillments_on_reward_item_id"
   end
@@ -82,6 +84,7 @@ ActiveRecord::Schema[7.1].define(version: 2025_04_03_234212) do
     t.bigint "reward_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.integer "production_priority"
     t.index ["reward_id", "name"], name: "index_reward_items_on_reward_id_and_name", unique: true
     t.index ["reward_id"], name: "index_reward_items_on_reward_id"
   end

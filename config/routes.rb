@@ -37,7 +37,7 @@ Rails.application.routes.draw do
     patch 'fulfillment/update_reward', to: 'fulfillment#update_reward', as: 'update_reward_fulfillment'
     
     resources :rewards do
-      resources :reward_items, only: [:create, :update, :destroy]
+      resources :reward_items
       
       collection do
         get 'fulfillment', to: 'rewards#fulfillment', as: 'fulfillment'

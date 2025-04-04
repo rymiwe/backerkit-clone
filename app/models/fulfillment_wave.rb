@@ -24,11 +24,17 @@ class FulfillmentWave < ApplicationRecord
   def progress_percentage
     return 0 if wave_items.empty?
     
+    # Get total items in this wave
     total_items = wave_items.sum(:quantity)
-    fulfilled_items = wave_items.joins(reward_item: :backer_item_fulfillments)
-                              .where(backer_item_fulfillments: { shipped: true })
-                              .count
+    return 0 if total_items == 0
     
-    [(fulfilled_items.to_f / total_items * 100).round, 100].min
+    # Count shipped fulfillments for all reward items in this wave
+    fulfilled_count = 0
+    wave_items.includes(:reward_item).each do |wave_item|
+      fulfilled_count += wave_item.reward_item.backer_item_fulfillments.where(shipped: true).count
+    end
+    
+    # Cap at 100%
+    [(fulfilled_count.to_f / total_items * 100).round, 100].min
   end
 end

@@ -19,7 +19,6 @@ module Fulfillment
 
       ActiveRecord::Base.transaction do
         update_wave_status
-        update_item_shipping_counts
         create_shipping_records
         notify_backers if should_notify_backers?
         true
@@ -50,20 +49,6 @@ module Fulfillment
       return if %w[shipping completed].include?(wave.status)
 
       wave.update!(status: 'shipping')
-    end
-
-    def update_item_shipping_counts
-      reward_items.each do |item|
-        # Only update shipping count if it's less than produced count
-        quantity = [wave.wave_items.find_by(reward_item: item)&.quantity || 0,
-                    item.produced_count - item.shipped_count].min
-
-        next if quantity <= 0
-
-        # Update the shipped count, ensuring it doesn't exceed the produced count
-        new_shipped_count = [item.shipped_count + quantity, item.produced_count].min
-        item.update!(shipped_count: new_shipped_count)
-      end
     end
 
     def create_shipping_records
