@@ -1,0 +1,47 @@
+<h1>Add New Item to <%= @reward.title %></h1>
+
+<%= form_with(model: [@reward.project, @reward, @reward_item], local: true) do |form| %>
+  <% if @reward_item.errors.any? %>
+    <div class="alert alert-danger">
+      <h2><%= pluralize(@reward_item.errors.count, "error") %> prohibited this item from being saved:</h2>
+      <ul>
+        <% @reward_item.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="form-group mb-3">
+    <%= form.label :name %>
+    <%= form.text_field :name, class: "form-control" %>
+  </div>
+
+  <div class="form-group mb-3">
+    <%= form.label :description %>
+    <%= form.text_area :description, class: "form-control", rows: 3 %>
+  </div>
+
+  <div class="form-group mb-3">
+    <%= form.label :quantity_per_reward, "Quantity Per Reward" %>
+    <%= form.number_field :quantity_per_reward, class: "form-control", min: 1 %>
+    <small class="form-text text-muted">How many of this item will each backer receive?</small>
+  </div>
+
+  <div class="form-group mb-3">
+    <%= form.label :production_priority, "Production Priority" %>
+    <%= form.number_field :production_priority, class: "form-control", min: 1 %>
+    <small class="form-text text-muted">Higher numbers indicate higher priority (1 = lowest priority)</small>
+  </div>
+
+  <div class="form-group mb-3">
+    <%= form.label :produced_count, "Items Produced" %>
+    <%= form.number_field :produced_count, class: "form-control", min: 0 %>
+    <small class="form-text text-muted">How many have been produced so far?</small>
+  </div>
+
+  <div class="actions mb-3">
+    <%= form.submit "Add Item", class: "btn btn-primary" %>
+    <%= link_to "Cancel", project_fulfillment_dashboard_path(@reward.project), class: "btn btn-secondary" %>
+  </div>
+<% end %>
