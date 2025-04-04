@@ -4,6 +4,10 @@
      data-slider-status-value="<%= reward.status.to_s.gsub('_', '-') %>"
      class="mt-6 px-2">
   
+  <style>
+    <%= styles %>
+  </style>
+  
   <%= form_with url: form_url, method: :patch, class: "mt-2" do |form| %>
     <%= form.hidden_field :reward_id, value: reward.id %>
     
@@ -12,14 +16,14 @@
       <span class="text-sm font-medium text-gray-700" data-slider-target="valueDisplay"><%= current_value %>%</span>
     </div>
     
-    <div class="relative mb-4 slider-with-fill <%= reward.status.to_s.gsub('_', '-') %>" 
+    <div class="relative mb-4 slider-container <%= reward.status.to_s.gsub('_', '-') %>" 
          style="--fill-percentage: <%= current_value %>%"
          data-slider-target="sliderContainer">
       <%= form.range_field "reward[fulfillment_progress]", 
                           min: 0, 
                           max: 100, 
                           value: current_value,
-                          class: "w-full z-10 relative",
+                          class: "w-full",
                           data: { 
                             action: "input->slider#updateProgress",
                             slider_target: "input"

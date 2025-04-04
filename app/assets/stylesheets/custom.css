@@ -17,7 +17,7 @@
   margin-top: auto;
 }
 
-/* Progress Slider Styles */
+/* Progress Slider Styles - Base styles that can be overridden by components */
 input[type="range"] {
   -webkit-appearance: none;
   appearance: none;
@@ -27,6 +27,7 @@ input[type="range"] {
   background: #e5e7eb; /* Gray-200 */
   outline: none;
   position: relative;
+  z-index: 1;
 }
 
 input[type="range"]::-webkit-slider-thumb {
@@ -52,22 +53,64 @@ input[type="range"]::-moz-range-thumb {
   border: none;
 }
 
-/* Custom progress bar styling */
-.slider-container {
+/* Table Layout Helpers */
+.table-responsive {
+  overflow-x: auto;
+  width: 100%;
+}
+
+/* Responsive Table Container */
+.table-container {
   position: relative;
   width: 100%;
 }
 
-.slider-container::before {
-  content: "";
-  position: absolute;
-  height: 8px;
-  background-color: #4f46e5; /* Indigo-600 */
-  border-radius: 5px 0 0 5px;
-  top: 50%;
-  transform: translateY(-50%);
-  left: 0;
-  width: var(--fill-percentage, 0%);
-  pointer-events: none;
-  z-index: 1;
+/* Ensure fixed tables display properly on smaller screens */
+.table-fixed {
+  table-layout: fixed;
+  width: 100%;
+}
+
+/* Fulfillment Wave Table Specific */
+.fulfillment-wave-table th {
+  padding: 0.75rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 500;
+}
+
+.fulfillment-wave-table td {
+  padding: 0.75rem;
+  vertical-align: middle;
+}
+
+/* Status Badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.125rem 0.5rem;
+  border-radius: 9999px;
+  font-size: 0.75rem;
+  font-weight: 500;
+}
+
+.status-badge-not-started {
+  background-color: #f3f4f6;
+  color: #6b7280;
+}
+
+.status-badge-in-progress {
+  background-color: #dbeafe;
+  color: #1e40af;
+}
+
+.status-badge-awaiting-shipping {
+  background-color: #fef3c7;
+  color: #92400e;
+}
+
+.status-badge-shipped, .status-badge-completed {
+  background-color: #d1fae5;
+  color: #065f46;
 }
