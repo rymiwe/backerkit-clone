@@ -95,7 +95,7 @@ RSpec.describe FulfillmentWavesController do
         create(:fulfillment_wave, project: project, name: "Test Wave", status: "planned",
                                   target_ship_date: Time.zone.today + 30.days)
       end
-      let!(:wave_item) { create(:wave_item, fulfillment_wave: wave, reward_item: reward_item, quantity: 5) }
+      let!(:original_wave_item) { create(:wave_item, fulfillment_wave: wave, reward_item: reward_item, quantity: 5) }
 
       it "shows the fulfillment wave details" do
         get :show, params: { project_id: project.id, id: wave.id }
@@ -120,7 +120,7 @@ RSpec.describe FulfillmentWavesController do
         create(:fulfillment_wave, project: project, name: "Original Name", status: "planned",
                                   target_ship_date: Time.zone.today + 30.days)
       end
-      let!(:wave_item) { create(:wave_item, fulfillment_wave: wave, reward_item: reward_item, quantity: 5) }
+      let!(:original_wave_item) { create(:wave_item, fulfillment_wave: wave, reward_item: reward_item, quantity: 5) }
 
       it "updates the fulfillment wave attributes" do
         put :update, params: {
@@ -140,9 +140,11 @@ RSpec.describe FulfillmentWavesController do
         expect(wave.status).to eq("in_progress")
         expect(wave.target_ship_date.to_date).to eq((Time.zone.today + 45.days).to_date)
 
-        # Verify wave item is updated
-        wave_item.reload
-        expect(wave_item.quantity).to eq(8)
+        # Verify wave item is updated - we need to get the new wave item
+        # since our controller destroys the old ones and creates new ones
+        new_wave_item = wave.wave_items.where(reward_item_id: reward_item.id).first
+        expect(new_wave_item).to be_present
+        expect(new_wave_item.quantity).to eq(8)
 
         expect(response).to be_redirect
       end

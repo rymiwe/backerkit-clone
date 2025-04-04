@@ -36,8 +36,15 @@ class FulfillmentWavesController < ApplicationController
   
   def update
     if @fulfillment_wave.update(fulfillment_wave_params)
-      @fulfillment_wave.wave_items.destroy_all # Remove existing items
+      # Save the IDs to avoid querying after they're destroyed
+      old_wave_item_ids = @fulfillment_wave.wave_items.pluck(:id)
+      
+      # Remove existing items
+      @fulfillment_wave.wave_items.destroy_all
+      
+      # Add the updated items
       handle_wave_items
+      
       redirect_to project_fulfillment_waves_path(@project), notice: "Fulfillment wave was successfully updated."
     else
       @available_items = available_reward_items
@@ -47,8 +54,13 @@ class FulfillmentWavesController < ApplicationController
   end
   
   def destroy
-    @fulfillment_wave.destroy
-    redirect_to project_fulfillment_waves_path(@project), notice: "Fulfillment wave was successfully deleted."
+    # Prevent deletion of waves that have started shipping
+    if %w[shipping completed].include?(@fulfillment_wave.status)
+      redirect_to project_fulfillment_waves_path(@project), alert: "Cannot delete a wave that is already shipping or completed."
+    else
+      @fulfillment_wave.destroy
+      redirect_to project_fulfillment_waves_path(@project), notice: "Fulfillment wave was successfully deleted."
+    end
   end
   
   private
@@ -77,15 +89,30 @@ class FulfillmentWavesController < ApplicationController
   end
   
   def handle_wave_items
-    return unless params[:wave_items].present?
-    
-    params[:wave_items].each do |item_id, quantity|
-      next if quantity.to_i <= 0
+    # Handle both old "wave_items" format and test-expected formats (item_ids and quantity_map)
+    if params[:wave_items].present?
+      params[:wave_items].each do |item_id, quantity|
+        next if quantity.to_i <= 0
+        
+        @fulfillment_wave.wave_items.create(
+          reward_item_id: item_id,
+          quantity: quantity.to_i
+        )
+      end
+    elsif params[:fulfillment_wave] && params[:fulfillment_wave][:item_ids].present?
+      # Support the format used in tests
+      item_ids = params[:fulfillment_wave][:item_ids]
+      quantity_map = params[:fulfillment_wave][:quantity_map] || {}
       
-      @fulfillment_wave.wave_items.create(
-        reward_item_id: item_id,
-        quantity: quantity.to_i
-      )
+      item_ids.each do |item_id|
+        quantity = quantity_map[item_id].to_i
+        next if quantity <= 0
+        
+        @fulfillment_wave.wave_items.create(
+          reward_item_id: item_id,
+          quantity: quantity
+        )
+      end
     end
   end
 end
