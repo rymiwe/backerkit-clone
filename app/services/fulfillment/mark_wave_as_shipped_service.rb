@@ -10,6 +10,12 @@ module Fulfillment
     end
 
     def call
+      Rails.logger.debug("MarkWaveAsShippedService#call - Checking authorization")
+      Rails.logger.debug("User: #{user.inspect}, Project Creator: #{project.creator.inspect}")
+      Rails.logger.debug("User roles: #{user.roles.inspect}")
+      Rails.logger.debug("User has creator role: #{user.is_creator?}")
+      Rails.logger.debug("User has admin role: #{user.has_role?('admin')}")
+      
       return false unless valid?
 
       ActiveRecord::Base.transaction do
@@ -33,7 +39,9 @@ module Fulfillment
     # 1. User is the project creator (both by association and role)
     # 2. User has admin role
     def valid?
-      (user == project.creator && user.is_creator?) || user.has_role?('admin')
+      result = (user == project.creator && user.is_creator?) || user.has_role?('admin')
+      Rails.logger.debug("MarkWaveAsShippedService#valid? - Result: #{result}")
+      result
     end
 
     def update_wave_status
