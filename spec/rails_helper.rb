@@ -44,26 +44,9 @@ RSpec.configure do |config|
   # Filter lines from Rails gems in backtraces
   config.filter_rails_from_backtrace!
   
-  # Skip ALL system tests in CI environment
-  # This needs to be in rails_helper.rb to ensure it's applied before test execution
-  if ENV['CI'] || ENV['SEMAPHORE']
-    config.before(:each, type: :system) do
-      skip "System tests temporarily disabled in CI environment"
-    end
-    
-    # Also skip tests in the system directory regardless of explicit type
-    config.around(:each) do |example|
-      if example.metadata[:file_path].include?('/spec/system/')
-        skip "System test in spec/system directory disabled in CI environment"
-      else
-        example.run
-      end
-    end
-  else
-    # Only load system test helpers for system tests in non-CI environments
-    config.before(:each, type: :system) do
-      require Rails.root.join('spec/support/system_test_helper.rb')
-    end
+  # Only load system test helpers for system tests
+  config.before(:each, type: :system) do
+    require Rails.root.join('spec/support/system_test_helper.rb')
   end
 end
 
