@@ -1,4 +1,6 @@
 class RewardItem < ApplicationRecord
+  include Fulfillable
+  
   belongs_to :reward
   has_many :wave_items, dependent: :destroy
   has_many :fulfillment_waves, through: :wave_items
@@ -10,7 +12,7 @@ class RewardItem < ApplicationRecord
   validates :produced_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :shipped_count, presence: true, numericality: { greater_than_or_equal_to: 0 }
   validates :name, uniqueness: { scope: :reward_id, message: "must be unique within a reward" }
-  validate :shipped_cannot_exceed_produced
+  validates_with ShippingCountValidator
   
   before_validation :calculate_total_needed, if: :needs_total_calculation?
   
@@ -57,12 +59,6 @@ class RewardItem < ApplicationRecord
   end
   
   private
-  
-  def shipped_cannot_exceed_produced
-    if shipped_count && produced_count && shipped_count > produced_count
-      errors.add(:shipped_count, "cannot exceed the number of produced items")
-    end
-  end
   
   def calculate_total_needed
     backer_count = reward.pledges.count

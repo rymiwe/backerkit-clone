@@ -1,4 +1,6 @@
 class FulfillmentWave < ApplicationRecord
+  include Fulfillable
+  
   belongs_to :project
   has_many :wave_items, dependent: :destroy
   has_many :reward_items, through: :wave_items
@@ -7,6 +9,7 @@ class FulfillmentWave < ApplicationRecord
   validates :target_ship_date, presence: true
   validates :status, presence: true
   
+  # FulfillmentWave specific statuses (augments the basic statuses from Fulfillable)
   enum status: {
     planned: 'planned',
     in_progress: 'in_progress',
