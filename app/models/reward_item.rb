@@ -26,6 +26,11 @@ class RewardItem < ApplicationRecord
     [(shipped_count.to_f / total_needed * 100).round, 100].min
   end
   
+  # Added to support tests expecting needed_count method
+  def needed_count
+    total_needed
+  end
+  
   def status
     if produced_count >= total_needed && total_needed > 0
       "ready"

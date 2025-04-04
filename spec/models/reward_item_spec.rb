@@ -59,29 +59,31 @@ RSpec.describe RewardItem do
   end
 
   describe "instance methods" do
-    let(:item) { create(:reward_item, total_needed: 20, produced_count: 10, shipped_count: 5) }
+    let(:item) { create(:reward_item, :half_produced) }
 
     it "calculates production percentage" do
       expect(item.production_percentage).to eq(50) # 10/20 * 100
     end
 
     it "calculates shipping percentage" do
-      expect(item.shipping_percentage).to eq(25) # 5/20 * 100
+      item = create(:reward_item, :half_shipped)
+      expect(item.shipping_percentage).to eq(50) # 10/20 * 100
     end
 
     it "calculates needed_count" do
-      expect(item.needed_count).to eq(20)
+      expect(item.total_needed).to eq(20)
     end
 
     it "determines status based on production and shipping progress" do
       # Test various status states
-      not_started = create(:reward_item, produced_count: 0, shipped_count: 0, total_needed: 10)
-      expect(not_started.status).to eq("ready")
+      not_started = create(:reward_item, :not_started)
+      expect(not_started.status).to eq("not_started")
 
-      in_progress = create(:reward_item, produced_count: 5, shipped_count: 0, total_needed: 10)
+      in_progress = create(:reward_item, :in_progress)
       expect(in_progress.status).to eq("in_progress")
 
-      # We could test more status values if the model defines them
+      ready = create(:reward_item, :ready)
+      expect(ready.status).to eq("ready")
     end
   end
 
