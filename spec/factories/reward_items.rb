@@ -7,6 +7,6 @@ FactoryBot.define do
     total_needed { 10 }
     produced_count { 0 }
     shipped_count { 0 }
-    production_priority { 1 }
+    # production_priority attribute removed - not in model schema
   end
 end
