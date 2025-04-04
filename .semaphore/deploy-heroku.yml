@@ -24,5 +24,7 @@ blocks:
             - chmod 600 ~/.netrc
             - git config --global user.name "Semaphore CI"
             - git config --global user.email "ci@semaphore.com"
-            - heroku git:remote -a backerkit-clone
-            - git push heroku $SEMAPHORE_GIT_BRANCH:main
+            # Try a simpler approach - direct API deployment
+            - heroku apps:info -a backerkit-clone
+            # Force push to master to avoid conflicts
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/backerkit-clone.git +HEAD:refs/heads/master
