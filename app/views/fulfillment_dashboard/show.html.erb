@@ -128,6 +128,61 @@
       
       <!-- Fulfillment Progress -->
       <div class="mt-4 mb-6">
+        <!-- Ensure consistent slider styling across environments -->
+        <style>
+          .slider-container {
+            position: relative;
+            width: 100%;
+          }
+          
+          .slider-container input[type="range"] {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            background: #e5e7eb;
+            outline: none;
+            position: relative;
+          }
+          
+          .slider-container input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            position: relative;
+            z-index: 3;
+          }
+          
+          .slider-container input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #4f46e5;
+            cursor: pointer;
+            position: relative;
+            z-index: 3;
+            border: none;
+          }
+          
+          .slider-container::before {
+            content: "";
+            position: absolute;
+            height: 8px;
+            background-color: #4f46e5;
+            border-radius: 5px 0 0 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            left: 0;
+            width: var(--fill-percentage, 0%);
+            pointer-events: none;
+            z-index: 1;
+          }
+        </style>
         <div class="flex justify-between mb-1">
           <span class="text-sm font-medium text-gray-500">Fulfillment Progress</span>
           <span class="text-sm font-medium text-gray-500" data-slider-target="valueDisplay"><%= reward.fulfillment_progress || 0 %>%</span>
