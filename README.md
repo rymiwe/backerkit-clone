@@ -15,6 +15,60 @@ Visit the live demo at: [https://backerkit-clone-ac3c300c1e50.herokuapp.com/](ht
   - **Fulfillment Waves**: Group items for batch production and shipment
   - **Backer-Level Tracking**: Track which items have been shipped to which backers
   - **Progress Visualization**: See fulfillment status and progress at a glance
+  - **Status Variety**: Support for multiple fulfillment statuses (planned, in progress, shipping, completed)
+
+## Feature Showcase
+
+### Fulfillment Dashboard
+
+The central hub for tracking and managing the entire fulfillment process:
+
+![Fulfillment Dashboard](docs/images/fulfillment_dashboard.png)
+
+Key features:
+- Overall project fulfillment progress visualization
+- Status breakdown by wave and item
+- Interactive progress sliders for updating completion percentages with real-time visual feedback
+- Quick access to create or modify fulfillment waves
+- Status badges that clearly communicate each wave's current state
+
+### Fulfillment Waves Management
+
+The fulfillment waves feature enables project creators to organize their reward fulfillment process into logical batches:
+
+![Fulfillment Waves Index](docs/images/fulfillment_waves_index.png)
+
+Project creators can:
+- Create waves for different production runs or shipping groups
+- Set target shipping dates for better planning
+- Track the status of each wave (planned, in progress, shipping, completed)
+- Monitor progress for each wave with visual indicators
+- View all waves with consistent status badges for easy visual recognition
+
+### Wave Detail & Item Tracking
+
+Dive deeper into individual fulfillment waves to manage specific items:
+
+![Wave Detail](docs/images/wave_detail.png)
+
+This interface allows:
+- Tracking which items are included in each wave
+- Updating item quantities and fulfillment status
+- Managing production and shipping timelines
+- Adding notes for special handling instructions
+- Visualizing the progress of each item with clear percentage indicators
+
+### Item Fulfillment Tracking
+
+Track the production and shipping status of individual items within each reward:
+
+![Item Tracking](docs/images/item_tracking.png)
+
+Features include:
+- Detailed item-by-item tracking of needed, produced, and shipped quantities
+- Visual progress indicators for both production and shipping
+- Status badges that update automatically based on progress
+- Centralized view to identify bottlenecks in the fulfillment process
 
 ## CI/CD Pipeline & Deployment
 
@@ -40,6 +94,7 @@ The application is automatically deployed to Heroku when changes are pushed to t
 - **Database Migrations**: Automatically run during the release phase
 - **Asset Precompilation**: Handled by the Heroku Ruby buildpack
 - **Environment Variables**: Managed securely through Semaphore secrets
+- **Database Reset & Reseed**: Ensures demo data is fresh for demonstrations
 
 View the Semaphore configuration in the `.semaphore` directory to see how the pipeline is structured.
 
@@ -57,7 +112,7 @@ All accounts use the password: `password`
 
 | Email | Projects |
 |-------|----------|
-| admin@example.com | Eco-Friendly Water Bottle, Handcrafted Leather Journals |
+| admin@example.com | ALIEN RPG - Evolved Edition, Animation VERSUS - Fighting Game, and more |
 | sarah@example.com | Ultimate Cooking Guide, Custom Wooden Desk Organizer |
 | michael@example.com | Modular Desk Lamp, Time Travel Documentary |
 | emily@example.com | Pocket-Sized Adventure Camera |
@@ -83,10 +138,11 @@ All user accounts have made pledges to various projects. To see which projects a
 ### Example Fulfillment Workflow
 
 1. Log in as `admin@example.com`
-2. Go to the "Eco-Friendly Water Bottle" project
+2. Go to the "ALIEN RPG - Evolved Edition" project
 3. Click "Fulfillment Dashboard"
-4. Create a new fulfillment wave for a batch of items
-5. Update the fulfillment status for specific backers
+4. Explore waves with different statuses (completed, shipping, in progress, planned)
+5. Update the fulfillment progress using the interactive sliders
+6. View item-level tracking within each wave
 
 ## Technology Stack
 
@@ -106,10 +162,14 @@ Visit the [Component Library](/component-library) to explore all available compo
 
 ### Key Components
 
-- **StatusBadgeComponent**: Display status indicators with consistent styling
-- **ProgressBarComponent**: Visualize completion percentages
-- **ProgressSliderComponent**: Interactive fulfillment progress controls
+- **StatusBadgeComponent**: Display status indicators with consistent styling across waves and items
+- **ProgressBarComponent**: Visualize completion percentages with proper fill effects
+- **ProgressSliderComponent**: Interactive fulfillment progress controls with real-time feedback
 - **ModalComponent**: Accessible dialog windows
+- **ToastComponent**: Temporary notification messages
+- **FormErrorComponent**: Standardized form validation messages
+- **FormLabelComponent**: Accessible form field labels
+- **EmptyStateComponent**: Engaging placeholders for empty data states
 
 All components follow accessibility best practices and are responsive across different screen sizes.
 

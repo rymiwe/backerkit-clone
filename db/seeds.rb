@@ -551,6 +551,318 @@ puts "Created #{Project.count} projects"
 puts "Created #{Reward.count} rewards"
 puts "Created #{Pledge.count} pledges"
 puts "Created #{RewardItem.count} reward items"
+
+# Set up fulfillment waves with proper varied statuses and visible tracking data
+puts "\n=== Setting up enhanced fulfillment tracking data ==="
+
+# 1. Ensure admin owns projects
+admin = User.find_by(email: "admin@example.com")
+if admin
+  puts "Associating projects with admin..."
+  Project.all.each do |project|
+    project.update_columns(creator_id: admin.id)
+    puts "  Associated '#{project.title}' with admin"
+  end
+end
+
+# 2. Focus on two main projects for the demo
+alien_project = Project.find_by(title: "ALIEN RPG - Evolved Edition")
+game_project = Project.find_by(title: "Animation VERSUS - Fighting Game")
+
+if alien_project && game_project
+  puts "Setting up showcase projects..."
+  
+  # 3. Create fulfillment waves with varied statuses
+  puts "Creating fulfillment waves with varied statuses..."
+  
+  # ALIEN RPG project waves
+  if alien_project.fulfillment_waves.count < 4
+    # Remove any existing waves to avoid duplicates
+    alien_project.fulfillment_waves.destroy_all
+    
+    # A. Completed wave (Digital Products)
+    digital_wave = FulfillmentWave.create!(
+      project: alien_project,
+      name: "Digital Products (Completed)",
+      status: "completed",
+      target_ship_date: Date.today - 30.days,
+      description: "All digital products including PDFs and digital stretch goals."
+    )
+    puts "  Created completed wave: #{digital_wave.name}"
+    
+    # B. Shipping wave (Early Backers)
+    early_wave = FulfillmentWave.create!(
+      project: alien_project,
+      name: "Early Backer Rewards (Shipping)",
+      status: "shipping",
+      target_ship_date: Date.today - 3.days,
+      description: "Priority shipment for early backers of the Digital + Physical bundle."
+    )
+    puts "  Created shipping wave: #{early_wave.name}"
+    
+    # C. In Progress wave (Core Products)
+    core_wave = FulfillmentWave.create!(
+      project: alien_project,
+      name: "Core Rulebooks (In Progress)",
+      status: "in_progress",
+      target_ship_date: Date.today + 15.days,
+      description: "Physical rulebooks, dice sets, and GM screens for all backers."
+    )
+    puts "  Created in-progress wave: #{core_wave.name}"
+    
+    # D. Planned wave (Stretch Goals)
+    stretch_wave = FulfillmentWave.create!(
+      project: alien_project,
+      name: "Stretch Goal Items (Planned)",
+      status: "planned",
+      target_ship_date: Date.today + 60.days,
+      description: "Exclusive stretch goal items unlocked during campaign."
+    )
+    puts "  Created planned wave: #{stretch_wave.name}"
+    
+    # Get items for each wave (digital, physical, collector)
+    digital_items = RewardItem.joins(:reward)
+                           .where(rewards: { project_id: alien_project.id })
+                           .where("reward_items.name LIKE ?", "%PDF%")
+                           .or(RewardItem.joins(:reward)
+                                       .where(rewards: { project_id: alien_project.id })
+                                       .where("reward_items.name LIKE ?", "%Digital%"))
+                           .limit(3)
+    
+    physical_items = RewardItem.joins(:reward)
+                            .where(rewards: { project_id: alien_project.id })
+                            .where("reward_items.name LIKE ?", "%Rulebook%")
+                            .or(RewardItem.joins(:reward)
+                                        .where(rewards: { project_id: alien_project.id })
+                                        .where("reward_items.name LIKE ?", "%Dice%"))
+                            .limit(3)
+    
+    collector_items = RewardItem.joins(:reward)
+                             .where(rewards: { project_id: alien_project.id })
+                             .where("reward_items.name LIKE ?", "%Collector%")
+                             .or(RewardItem.joins(:reward)
+                                         .where(rewards: { project_id: alien_project.id })
+                                         .where("reward_items.name LIKE ?", "%Art%"))
+                             .limit(3)
+    
+    # If any item group is empty, just get some items
+    if digital_items.empty? || physical_items.empty? || collector_items.empty?
+      all_items = RewardItem.joins(:reward).where(rewards: { project_id: alien_project.id }).to_a
+      
+      if all_items.present?
+        digital_items = all_items.first(3) if digital_items.empty?
+        physical_items = all_items[3..5] if physical_items.empty?
+        collector_items = all_items[6..8] if collector_items.empty?
+      end
+    end
+    
+    # Add items to waves with appropriate progress
+    if digital_items.present?
+      digital_items.each do |item|
+        # For completed wave - 100% complete
+        wave_item = WaveItem.create!(
+          fulfillment_wave: digital_wave,
+          reward_item: item,
+          quantity: 100
+        )
+        
+        item.update!(
+          quantity_per_reward: 1,
+          produced_count: 100,
+          shipped_count: 100
+        )
+      end
+    end
+    
+    if physical_items.present?
+      # Split physical items between shipping and in-progress waves
+      physical_items.each_with_index do |item, index|
+        if index == 0 
+          # For shipping wave - 100% produced, 70% shipped
+          wave_item = WaveItem.create!(
+            fulfillment_wave: early_wave,
+            reward_item: item,
+            quantity: 100
+          )
+          
+          item.update!(
+            quantity_per_reward: 1,
+            produced_count: 100,
+            shipped_count: 70
+          )
+        else
+          # For in-progress wave - 50% produced, 0% shipped
+          wave_item = WaveItem.create!(
+            fulfillment_wave: core_wave,
+            reward_item: item,
+            quantity: 100
+          )
+          
+          item.update!(
+            quantity_per_reward: 1,
+            produced_count: 50,
+            shipped_count: 0
+          )
+        end
+      end
+    end
+    
+    if collector_items.present?
+      collector_items.each do |item|
+        # For planned wave - 10% produced, 0% shipped
+        wave_item = WaveItem.create!(
+          fulfillment_wave: stretch_wave,
+          reward_item: item,
+          quantity: 100
+        )
+        
+        item.update!(
+          quantity_per_reward: 1,
+          produced_count: 10,
+          shipped_count: 0
+        )
+      end
+    end
+  end
+end
+
+# Game project waves
+if game_project.fulfillment_waves.count < 3
+  # Remove any existing waves to avoid duplicates
+  game_project.fulfillment_waves.destroy_all
+  
+  # A. Completed wave (Digital Keys)
+  keys_wave = FulfillmentWave.create!(
+    project: game_project,
+    name: "Digital Keys (Completed)",
+    status: "completed",
+    target_ship_date: Date.today - 20.days,
+    description: "Distribution of all game download keys."
+  )
+  puts "  Created completed wave: #{keys_wave.name}"
+  
+  # B. In Progress wave (Digital Assets)
+  assets_wave = FulfillmentWave.create!(
+    project: game_project,
+    name: "Digital Assets (In Progress)",
+    status: "in_progress",
+    target_ship_date: Date.today + 5.days,
+    description: "Digital art books and soundtrack distribution."
+  )
+  puts "  Created in-progress wave: #{assets_wave.name}"
+  
+  # C. Planned wave (Physical Merch)
+  merch_wave = FulfillmentWave.create!(
+    project: game_project,
+    name: "Physical Merchandise (Planned)",
+    status: "planned",
+    target_ship_date: Date.today + 45.days,
+    description: "All physical items including collector's boxes, figurines, and CDs."
+  )
+  puts "  Created planned wave: #{merch_wave.name}"
+  
+  # Get items for each wave
+  digital_keys = RewardItem.joins(:reward)
+                        .where(rewards: { project_id: game_project.id })
+                        .where("reward_items.name LIKE ?", "%Key%")
+                        .limit(2)
+  
+  digital_assets = RewardItem.joins(:reward)
+                          .where(rewards: { project_id: game_project.id })
+                          .where("reward_items.name LIKE ?", "%Art%")
+                          .or(RewardItem.joins(:reward)
+                                      .where(rewards: { project_id: game_project.id })
+                                      .where("reward_items.name LIKE ?", "%Soundtrack%"))
+                          .limit(2)
+  
+  physical_merch = RewardItem.joins(:reward)
+                         .where(rewards: { project_id: game_project.id })
+                         .where("reward_items.name LIKE ?", "%Box%")
+                         .or(RewardItem.joins(:reward)
+                                     .where(rewards: { project_id: game_project.id })
+                                     .where("reward_items.name LIKE ?", "%Figurine%"))
+                         .limit(2)
+  
+  # If any item group is empty, get other items
+  if digital_keys.empty? || digital_assets.empty? || physical_merch.empty?
+    all_items = RewardItem.joins(:reward).where(rewards: { project_id: game_project.id }).to_a
+    
+    if all_items.present?
+      digital_keys = all_items.first(2) if digital_keys.empty?
+      digital_assets = all_items[2..3] if digital_assets.empty?
+      physical_merch = all_items[4..5] if physical_merch.empty?
+    end
+  end
+  
+  # Add items to waves with appropriate progress
+  if digital_keys.present?
+    digital_keys.each do |item|
+      # For completed wave - 100% complete
+      wave_item = WaveItem.create!(
+        fulfillment_wave: keys_wave,
+        reward_item: item,
+        quantity: 100
+      )
+      
+      item.update!(
+        quantity_per_reward: 1,
+        produced_count: 100,
+        shipped_count: 100
+      )
+    end
+  end
+  
+  if digital_assets.present?
+    digital_assets.each do |item|
+      # For in-progress wave - 70% produced, 30% shipped
+      wave_item = WaveItem.create!(
+        fulfillment_wave: assets_wave,
+        reward_item: item,
+        quantity: 100
+      )
+      
+      item.update!(
+        quantity_per_reward: 1,
+        produced_count: 70,
+        shipped_count: 30
+      )
+    end
+  end
+  
+  if physical_merch.present?
+    physical_merch.each do |item|
+      # For planned wave - 5% produced, 0% shipped
+      wave_item = WaveItem.create!(
+        fulfillment_wave: merch_wave,
+        reward_item: item,
+        quantity: 100
+      )
+      
+      item.update!(
+        quantity_per_reward: 1,
+        produced_count: 5,
+        shipped_count: 0
+      )
+    end
+  end
+end
+  
+# Update rewards' fulfillment progress based on items
+puts "Updating reward fulfillment progress based on items..."
+[alien_project, game_project].each do |project|
+  project.rewards.each do |reward|
+    if reward.reward_items.any?
+      total_quantity = reward.reward_items.sum { |item| item.quantity_per_reward || 1 }
+      total_produced = reward.reward_items.sum { |item| item.produced_count || 0 }
+      
+      progress = [(total_produced.to_f / total_quantity * 100).round, 100].min
+      reward.update_columns(fulfillment_progress: progress)
+    end
+  end
+end
+
+puts "Fulfillment tracking data setup complete!"
+
 puts ""
 puts "You can log in with:"
 puts "Email: admin@example.com"

@@ -33,3 +33,6 @@ blocks:
             # Deploy the app using the Heroku CLI directly with the API key
             - heroku git:remote -a $APP_NAME
             - git push -f https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git HEAD:refs/heads/main
+            # Reset and reseed the database for the demo app
+            - echo "Resetting and reseeding the database..."
+            - heroku run rake db:migrate:reset db:seed -a $APP_NAME
