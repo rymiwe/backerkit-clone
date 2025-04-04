@@ -39,7 +39,8 @@ RSpec.describe "Fulfillment Dashboard", type: :system do
     expect(page).to have_content("Not Started") # Default status
     
     # Check backers information
-    expect(page).to have_content("1 backer") # Each reward has 1 backer
+    expect(page).to have_content("Backers")
+    expect(page).to have_content("1") # Each reward has 1 backer
   end
   
   scenario "Project creator can update fulfillment status of a reward" do

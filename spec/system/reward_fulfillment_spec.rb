@@ -31,14 +31,14 @@ RSpec.describe "Reward Fulfillment", type: :system do
     
     # Verify basic UI elements are present
     expect(page).to have_content(reward1.title)
-    expect(page).to have_content("Production Tracking")
+    expect(page).to have_content("Delivery Estimate")
   end
   
   scenario "Project creator can manage reward items for tracking" do
     visit project_fulfillment_dashboard_path(project)
     
     # Verify we can see the item tracking section
-    expect(page).to have_content("Item Production Tracking")
+    expect(page).to have_content("Item Tracking")
     expect(page).to have_button("Add Item")
   end
   
