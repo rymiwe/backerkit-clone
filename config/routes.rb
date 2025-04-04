@@ -25,6 +25,7 @@ Rails.application.routes.draw do
     
     # Backer Item Fulfillment routes
     resources :pledges do
+      resources :backer_item_fulfillments
       patch 'update_item_fulfillments', to: 'backer_item_fulfillments#update_for_backer'
     end
     
