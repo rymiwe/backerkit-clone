@@ -36,7 +36,7 @@ Key features:
 
 The fulfillment waves feature enables project creators to organize their reward fulfillment process into logical batches:
 
-![Fulfillment Waves Index](docs/images/fulfillment_waves_index.png)
+![Fulfillment Waves Index](docs/images/fulfillment_waves.png)
 
 Project creators can:
 - Create waves for different production runs or shipping groups
@@ -49,7 +49,7 @@ Project creators can:
 
 Dive deeper into individual fulfillment waves to manage specific items:
 
-![Wave Detail](docs/images/wave_detail.png)
+![Wave Detail](docs/images/completed_wave.png)
 
 This interface allows:
 - Tracking which items are included in each wave
@@ -62,7 +62,7 @@ This interface allows:
 
 Track the production and shipping status of individual items within each reward:
 
-![Item Tracking](docs/images/item_tracking.png)
+![Item Tracking](docs/images/in_progress_wave.png)
 
 Features include:
 - Detailed item-by-item tracking of needed, produced, and shipped quantities
@@ -143,6 +143,12 @@ All user accounts have made pledges to various projects. To see which projects a
 4. Explore waves with different statuses (completed, shipping, in progress, planned)
 5. Update the fulfillment progress using the interactive sliders
 6. View item-level tracking within each wave
+
+![Admin Dashboard](docs/images/admin_dashboard.png)
+
+![Project With Fulfillment Progress](docs/images/project_with_progress.png)
+
+![Wave Creation Form](docs/images/wave_form.png)
 
 ## Technology Stack
 
