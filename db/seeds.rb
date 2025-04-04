@@ -666,8 +666,14 @@ if alien_project && game_project
           quantity: 100
         )
         
+        # First update total_needed to ensure we can set produced_count properly
         item.update!(
           quantity_per_reward: 1,
+          total_needed: 100  # Set total_needed explicitly to match produced_count
+        )
+        
+        # Then update production counts
+        item.update!(
           produced_count: 100,
           shipped_count: 100
         )
@@ -685,8 +691,14 @@ if alien_project && game_project
             quantity: 100
           )
           
+          # First update total_needed to ensure we can set produced_count properly
           item.update!(
             quantity_per_reward: 1,
+            total_needed: 100  # Set total_needed explicitly to match produced_count
+          )
+          
+          # Then update production counts
+          item.update!(
             produced_count: 100,
             shipped_count: 70
           )
@@ -698,8 +710,14 @@ if alien_project && game_project
             quantity: 100
           )
           
+          # First update total_needed to ensure we can set produced_count properly
           item.update!(
             quantity_per_reward: 1,
+            total_needed: 100  # Set total_needed explicitly to match produced_count
+          )
+          
+          # Then update production counts
+          item.update!(
             produced_count: 50,
             shipped_count: 0
           )
@@ -716,8 +734,14 @@ if alien_project && game_project
           quantity: 100
         )
         
+        # First update total_needed to ensure we can set produced_count properly
         item.update!(
           quantity_per_reward: 1,
+          total_needed: 100  # Set total_needed explicitly to match produced_count
+        )
+        
+        # Then update production counts
+        item.update!(
           produced_count: 10,
           shipped_count: 0
         )
@@ -804,8 +828,14 @@ if game_project.fulfillment_waves.count < 3
         quantity: 100
       )
       
+      # First update total_needed to ensure we can set produced_count properly
       item.update!(
         quantity_per_reward: 1,
+        total_needed: 100  # Set total_needed explicitly to match produced_count
+      )
+      
+      # Then update production counts
+      item.update!(
         produced_count: 100,
         shipped_count: 100
       )
@@ -821,8 +851,14 @@ if game_project.fulfillment_waves.count < 3
         quantity: 100
       )
       
+      # First update total_needed to ensure we can set produced_count properly
       item.update!(
         quantity_per_reward: 1,
+        total_needed: 100  # Set total_needed explicitly to match what we need
+      )
+      
+      # Then update production counts
+      item.update!(
         produced_count: 70,
         shipped_count: 30
       )
@@ -838,8 +874,14 @@ if game_project.fulfillment_waves.count < 3
         quantity: 100
       )
       
+      # First update total_needed to ensure we can set produced_count properly
       item.update!(
         quantity_per_reward: 1,
+        total_needed: 100  # Set total_needed explicitly to match what we need
+      )
+      
+      # Then update production counts
+      item.update!(
         produced_count: 5,
         shipped_count: 0
       )
