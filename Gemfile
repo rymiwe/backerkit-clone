@@ -82,6 +82,9 @@ end
 group :test do
   # Use system testing [https://guides.rubyonrails.org/testing.html#system-testing]
   gem "selenium-webdriver"
+  gem "capybara"
+  gem "shoulda-matchers", "~> 5.0"
+  gem "webdrivers"
 end
 
 # Heroku deployment requirements

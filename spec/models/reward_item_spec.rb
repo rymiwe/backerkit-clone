@@ -42,11 +42,15 @@ RSpec.describe RewardItem do
   describe "callbacks" do
     let(:reward) { create(:reward) }
     let(:user) { create(:user) }
-    let(:pledge) { create(:pledge, reward: reward, backer: user) }
     
     it "calculates total_needed based on pledges and quantity_per_reward" do
-      # Create the reward_item after the pledge so callbacks recalculate total_needed
+      # First create a pledge for the reward
+      pledge = create(:pledge, reward: reward, backer: user)
+      
+      # Then create the reward_item - callbacks should calculate total_needed based on pledge count
       item = build(:reward_item, reward: reward, quantity_per_reward: 2, total_needed: 0)
+      
+      # Save should trigger the callback that calculates total_needed
       expect { item.save }.to change { item.total_needed }.from(0).to(2)
     end
     
