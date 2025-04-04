@@ -17,6 +17,10 @@ blocks:
           commands:
             - checkout
             - sem-version ruby 3.3.1
+            # Fix shallow clone issue - Heroku doesn't accept shallow clones
+            - echo "Converting shallow clone to full clone..."
+            - git fetch --unshallow || true
+            # Install and configure Heroku CLI
             - curl https://cli-assets.heroku.com/install.sh | sh
             - heroku --version
             # Set up Heroku auth with the API key from secrets
@@ -26,15 +30,12 @@ blocks:
             # Configure git for Heroku deployment
             - git config --global user.name "Semaphore CI"
             - git config --global user.email "ci@semaphore.com"
-            # Deploy to Heroku - handle the diverged branches situation
+            # Deploy to Heroku with full history
             - echo "Deploying to $APP_NAME..."
             # Add Heroku as a remote
             - heroku git:remote -a $APP_NAME
-            # Fetch Heroku branch to see what's there but don't merge yet
-            - git fetch https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git main
-            # Use force push with lease, which is safer than regular force push
-            # This will only force push if the remote hasn't been updated since our last fetch
-            - git push --force-with-lease https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git HEAD:refs/heads/main || git push --force https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git HEAD:refs/heads/main
+            # Force push to Heroku (we need this since we're deploying from CI)
+            - git push --force https://heroku:$HEROKU_API_KEY@git.heroku.com/$APP_NAME.git HEAD:refs/heads/main
             # Give the app some time to build and deploy before migrating the database
             - sleep 20
             # Run database migrations instead of a full reset to avoid data loss in production
