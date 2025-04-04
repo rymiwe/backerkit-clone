@@ -151,7 +151,7 @@ projects = [
     end_date: Date.today - 30.days,
     creator: users[3],
     status: "failed",
-    image_url: "https://images.unsplash.com/photo-1561059488-916d69792237?ixlib=rb-4.0.3&w=600&h=400&fit=crop&q=80",
+    image_url: "https://images.unsplash.com/photo-1481487196290-c152efe083f5?ixlib=rb-4.0.3&w=600&h=400&fit=crop&q=80",
     category: "Art"
   ),
   
