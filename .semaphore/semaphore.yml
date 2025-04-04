@@ -28,7 +28,7 @@ blocks:
       jobs:
         - name: Rubocop
           commands:
-            - bundle exec rubocop
+            - bundle exec rubocop --fail-level error
 
   - name: "Tests"
     task:

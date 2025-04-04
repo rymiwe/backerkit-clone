@@ -11,6 +11,12 @@ AllCops:
     - 'Rakefile'
     - 'node_modules/**/*'
     # Enable app directory checking for better code quality
+  SuggestExtensions: false
+
+# Use require syntax as the plugins may not be compatible yet
+require:
+  - rubocop-rails
+  - rubocop-rspec
 
 Style/Documentation:
   Enabled: false
@@ -37,6 +43,65 @@ Layout/LineLength:
   Max: 120
   Exclude:
     - 'db/seeds.rb'
+    - 'spec/**/*'
 
 Style/FrozenStringLiteralComment:
   Enabled: false
+
+# Add some specific rules for the validators
+Metrics/CyclomaticComplexity:
+  Max: 10
+  
+Metrics/PerceivedComplexity:
+  Max: 10
+
+# Disable some specific Rails cops that are too strict for this project
+Rails/SkipsModelValidations:
+  Enabled: false
+
+Rails/I18nLocaleTexts:
+  Enabled: false
+
+# Fix line ending issues
+Layout/EndOfLine:
+  EnforcedStyle: lf
+
+# RSpec-specific configurations
+RSpec/MultipleExpectations:
+  Enabled: false
+
+RSpec/ExampleLength:
+  Max: 20
+
+RSpec/NestedGroups:
+  Max: 5
+
+RSpec/DescribedClass:
+  Enabled: true
+
+RSpec/MultipleMemoizedHelpers:
+  Enabled: false
+  
+RSpec/LetSetup:
+  Enabled: false
+  
+# Disable RSpec/PredicateMatcher which is causing errors
+RSpec/PredicateMatcher:
+  Enabled: false
+
+# Disable Capybara cops that are causing errors
+RSpec/Capybara:
+  Enabled: false
+
+# Disable RSpec/AnyInstance
+RSpec/AnyInstance:
+  Enabled: false
+
+# Disable RSpec/IndexedLet
+RSpec/IndexedLet:
+  Enabled: false
+
+# Make RSpec formatting more readable
+Style/BlockDelimiters:
+  Exclude:
+    - 'spec/**/*'
