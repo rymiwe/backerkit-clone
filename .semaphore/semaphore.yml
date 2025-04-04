@@ -72,6 +72,5 @@ blocks:
             - git config --global user.name "Semaphore CI"
             - git config --global user.email "ci@semaphore.com"
             - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/backerkit-clone.git $SEMAPHORE_GIT_BRANCH:main
-    when:
-      branches:
-        - main # Only deploy when on the main branch
+    conditions:
+      - branch == 'main'
