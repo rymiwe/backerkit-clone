@@ -2,7 +2,7 @@ class ProjectsController < ApplicationController
   include ProjectOwnership
   
   before_action :require_login, except: [:index, :show]
-  before_action :set_project, only: [:show]
+  before_action :set_project, only: [:show, :edit, :update, :destroy]
   before_action :set_categories, only: [:index]
   
   # Define which actions require project ownership

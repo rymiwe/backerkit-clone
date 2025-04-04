@@ -22,7 +22,7 @@ module Ui
     end
     
     def form_url
-      project_fulfillment_dashboard_update_reward_path(project, reward_id: reward.id)
+      "/projects/#{project.id}/fulfillment_dashboard/update_reward"
     end
   end
 end

@@ -85,409 +85,154 @@
     <% end %>
   </div>
   
-  <div class="grid grid-cols-1 gap-6 mb-8">
-    <% @rewards.each do |reward| %>
-      <div class="bg-white rounded-lg shadow-md p-6">
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <!-- Reward Info -->
-          <div class="md:col-span-2">
-            <div class="flex justify-between mb-2">
-              <h3 class="text-xl font-bold"><%= number_to_currency(reward.amount) %></h3>
-              <span class="text-sm bg-gray-100 px-2 py-1 rounded-full"><%= reward.pledges.count %> backers</span>
-            </div>
-            <h4 class="text-lg font-medium text-gray-900 mb-2"><%= reward.title %></h4>
-            <p class="text-gray-700 mb-4"><%= reward.description %></p>
-          </div>
+  <!-- Rewards Section -->
+  <h2 class="text-xl font-semibold mb-4">Rewards Fulfillment</h2>
+  
+  <% @rewards.each do |reward| %>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+      <div class="flex justify-between items-start mb-4">
+        <div>
+          <h3 class="text-xl font-bold mb-1">$<%= number_with_precision(reward.amount, precision: 2) %> - <%= reward.title %></h3>
+          <p class="text-gray-600 mb-2"><%= reward.description %></p>
           
-          <!-- Status Info -->
-          <div class="bg-gray-50 p-4 rounded-lg">
-            <div class="flex flex-col h-full justify-between">
-              <div>
-                <div class="mb-4">
-                  <p class="text-sm text-gray-500 font-medium mb-1">Status</p>
-                  <%= render Ui::FulfillmentStatusComponent.new(status: reward.status || "not_started") %>
-                </div>
-                
-                <div class="mb-4">
-                  <p class="text-sm text-gray-500 font-medium mb-1">Delivery Estimate</p>
-                  <p class="text-sm font-medium"><%= reward.estimated_delivery ? reward.estimated_delivery.strftime("%B %Y") : "Not specified" %></p>
-                </div>
-              </div>
+          <div class="flex items-center space-x-4 mt-3">
+            <div>
+              <span class="text-sm text-gray-500 block mb-1">Status</span>
+              <% status_class = case reward.status
+                 when 'not_started' then 'bg-gray-100 text-gray-800'
+                 when 'in_production' then 'bg-blue-100 text-blue-800'
+                 when 'in_transit' then 'bg-indigo-100 text-indigo-800'
+                 when 'shipping_soon' then 'bg-purple-100 text-purple-800'
+                 when 'shipping' then 'bg-yellow-100 text-yellow-800'
+                 when 'completed' then 'bg-green-100 text-green-800'
+                 else 'bg-gray-100 text-gray-800'
+                 end %>
+              <span class="<%= status_class %> px-2 py-1 rounded text-sm">
+                <%= reward.status_name %>
+              </span>
+            </div>
+            
+            <div>
+              <span class="text-sm text-gray-500 block mb-1">Delivery Estimate</span>
+              <span class="text-sm font-medium">
+                <%= reward.estimated_delivery ? reward.estimated_delivery.strftime("%B %Y") : "Not specified" %>
+              </span>
+            </div>
+            
+            <div>
+              <span class="text-sm text-gray-500 block mb-1">Backers</span>
+              <span class="text-sm font-medium"><%= reward.pledges.count %></span>
             </div>
           </div>
         </div>
-        
-        <!-- Item-level tracking -->
-        <div class="mt-6 border-t pt-4">
-          <div class="flex justify-between items-center mb-4">
-            <h3 class="text-lg font-medium">Item Production Tracking</h3>
-            <div class="flex space-x-2">
-              <%= link_to "/projects/#{@project.id}/generate_fulfillments/#{reward.id}", method: :post, class: "inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800 mr-2" do %>
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
-                </svg>
-                Generate Fulfillment Records
-              <% end %>
-              <button data-controller="modal" data-action="modal#open" 
-                      data-modal-target-value="add-item-<%= reward.id %>" 
-                      class="inline-flex items-center text-sm text-indigo-600 hover:text-indigo-800">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Add Item
-              </button>
-            </div>
-          </div>
-          
-          <% if reward.reward_items.exists? %>
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead>
-                  <tr class="bg-gray-50">
-                    <th class="px-4 py-2 text-left">Item</th>
-                    <th class="px-4 py-2 text-center">Needed</th>
-                    <th class="px-4 py-2 text-center">Produced</th>
-                    <th class="px-4 py-2 text-center">Shipped</th>
-                    <th class="px-4 py-2 text-center">Status</th>
-                    <th class="px-4 py-2 text-center">Backer Fulfillment</th>
-                    <th class="px-4 py-2 text-right">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <% reward.reward_items.each do |item| %>
-                    <tr class="border-b">
-                      <td class="px-4 py-3">
-                        <div class="font-medium"><%= item.name %></div>
-                        <div class="text-xs text-gray-500">Per reward: <%= item.quantity_per_reward %></div>
-                      </td>
-                      <td class="px-4 py-3 text-center">
-                        <%= item.total_needed %>
-                      </td>
-                      <td class="px-4 py-3 text-center">
-                        <div class="flex items-center justify-center">
-                          <span class="text-sm font-medium mr-2"><%= item.production_percentage %>%</span>
-                          <div class="w-16 bg-gray-200 h-2 rounded-full">
-                            <div class="bg-blue-500 h-2 rounded-full" 
-                                style="width: <%= item.production_percentage %>%"></div>
-                          </div>
-                        </div>
-                        <div class="text-xs text-gray-500 mt-1">
-                          <%= item.produced_count %>/<%= item.total_needed %>
-                        </div>
-                      </td>
-                      <td class="px-4 py-3 text-center">
-                        <div class="flex items-center justify-center">
-                          <span class="text-sm font-medium mr-2"><%= item.shipping_percentage %>%</span>
-                          <div class="w-16 bg-gray-200 h-2 rounded-full">
-                            <div class="bg-green-500 h-2 rounded-full" 
-                                style="width: <%= item.shipping_percentage %>%"></div>
-                          </div>
-                        </div>
-                        <div class="text-xs text-gray-500 mt-1">
-                          <%= item.shipped_count %>/<%= item.total_needed %>
-                        </div>
-                      </td>
-                      <td class="px-4 py-3 text-center">
-                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= item.status_badge_class %>">
-                          <%= item.status_name %>
-                        </span>
-                      </td>
-                      
-                      <td class="px-4 py-3 text-center">
-                        <div class="text-xs text-gray-600">
-                          <% fulfilled_backers = item.backer_item_fulfillments.where(shipped: true).count %>
-                          <% total_backers = reward.pledges.count %>
-                          <div class="font-medium"><%= fulfilled_backers %>/<%= total_backers %> backers</div>
-                          <div class="w-16 mx-auto bg-gray-200 h-2 rounded-full mt-1">
-                            <div class="bg-indigo-500 h-2 rounded-full" 
-                                style="width: <%= total_backers > 0 ? (fulfilled_backers.to_f / total_backers * 100) : 0 %>%"></div>
-                          </div>
-                        </div>
-                      </td>
-                      <td class="px-4 py-3 text-right">
-                        <div class="flex justify-end space-x-2">
-                          <button data-controller="modal" data-action="modal#open" 
-                                  data-modal-target-value="update-item-<%= item.id %>" 
-                                  class="text-indigo-600 hover:text-indigo-900">
-                            <span class="sr-only">Edit</span>
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
-                            </svg>
-                          </button>
-                          
-                          <button data-controller="modal" data-action="modal#open" 
-                                  data-modal-target-value="manage-backer-fulfillment-<%= item.id %>" 
-                                  class="text-blue-600 hover:text-blue-900">
-                            <span class="sr-only">Manage Backer Fulfillment</span>
-                            <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                            </svg>
-                          </button>
-                          
-                          <%= link_to "/projects/#{@project.id}/rewards/#{reward.id}/reward_items/#{item.id}", method: :delete, 
-                                        class: "text-red-600 hover:text-red-900",
-                                        form: { data: { turbo_confirm: "Are you sure? This cannot be undone." } } %>
-                                <span class="sr-only">Delete</span>
-                                <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                </svg>
-                          </a>
-                        </div>
-                      </td>
-                    </tr>
-                    
-                    <!-- Update Item Modal -->
-                    <div id="update-item-<%= item.id %>" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" data-modal-target="modal">
-                      <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-                        <div class="flex justify-between items-center mb-4">
-                          <h3 class="text-lg font-medium">Update <%= item.name %></h3>
-                          <button data-action="modal#close" class="text-gray-400 hover:text-gray-500">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                        
-                        <%= form_with url: "/projects/#{@project.id}/fulfillment_dashboard/update_item_counts", method: :patch do |f| %>
-                          <%= f.hidden_field :reward_id, value: reward.id %>
-                          <%= f.hidden_field :item_id, value: item.id %>
-                          
-                          <div class="space-y-4">
-                            <div>
-                              <label class="block text-sm font-medium text-gray-700 mb-1">Produced Count</label>
-                              <%= f.number_field 'reward_item[produced_count]', value: item.produced_count, min: 0, max: [item.total_needed * 2, 10000].min, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
-                              <p class="text-xs text-gray-500 mt-1">Total needed: <%= item.total_needed %></p>
-                            </div>
-                            
-                            <div>
-                              <label class="block text-sm font-medium text-gray-700 mb-1">Shipped Count</label>
-                              <%= f.number_field 'reward_item[shipped_count]', value: item.shipped_count, min: 0, max: item.produced_count, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
-                              <p class="text-xs text-gray-500 mt-1">Cannot exceed produced count</p>
-                            </div>
-                            
-                            <div class="flex justify-end">
-                              <button type="button" data-action="modal#close" class="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md mr-2 hover:bg-gray-200">
-                                Cancel
-                              </button>
-                              <%= f.submit "Update Counts", class: "px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700" %>
-                            </div>
-                          </div>
-                        <% end %>
-                      </div>
-                    </div>
-                    
-                    <!-- Backer Fulfillment Modal -->
-                    <div id="manage-backer-fulfillment-<%= item.id %>" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" data-modal-target="modal">
-                      <div class="bg-white rounded-lg shadow-xl p-6 max-w-4xl w-full mx-4">
-                        <div class="flex justify-between items-center mb-4">
-                          <h3 class="text-lg font-medium">Manage Individual Backer Fulfillment: <%= item.name %></h3>
-                          <button data-action="modal#close" class="text-gray-400 hover:text-gray-500">
-                            <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                            </svg>
-                          </button>
-                        </div>
-                        
-                        <div class="my-4">
-                          <p class="text-sm text-gray-600">Track which specific backers have received this item.</p>
-                          
-                          <div class="mt-4 flex items-center justify-between">
-                            <div class="bg-blue-50 p-3 rounded-lg">
-                              <p class="text-sm font-medium text-blue-800">Production Status</p>
-                              <p class="mt-1 text-sm text-blue-600"><%= item.produced_count %> of <%= item.total_needed %> produced (<%= item.production_percentage %>%)</p>
-                            </div>
-                            
-                            <div class="bg-green-50 p-3 rounded-lg">
-                              <p class="text-sm font-medium text-green-800">Overall Shipping Status</p>
-                              <p class="mt-1 text-sm text-green-600"><%= item.shipped_count %> of <%= item.total_needed %> shipped (<%= item.shipping_percentage %>%)</p>
-                            </div>
-                            
-                            <div class="bg-indigo-50 p-3 rounded-lg">
-                              <p class="text-sm font-medium text-indigo-800">Per-Backer Status</p>
-                              <% fulfilled_backers = item.backer_item_fulfillments.where(shipped: true).count %>
-                              <% total_backers = reward.pledges.count %>
-                              <p class="mt-1 text-sm text-indigo-600"><%= fulfilled_backers %> of <%= total_backers %> backers fulfilled (<%= total_backers > 0 ? (fulfilled_backers.to_f / total_backers * 100).round : 0 %>%)</p>
-                            </div>
-                          </div>
-                        </div>
-                        
-                        <%= form_with url: "/projects/#{@project.id}/bulk_update_item_fulfillments", method: :post do |f| %>
-                          <%= f.hidden_field :reward_item_id, value: item.id %>
-                          
-                          <div class="mb-4 flex items-center justify-between">
-                            <div class="flex space-x-4 items-center">
-                              <%= f.select :shipped, [['Mark Selected as Shipped', true], ['Mark Selected as Not Shipped', false]], {}, 
-                                           class: "rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500" %>
-                              
-                              <%= f.submit "Update Selected Backers", class: "ml-4 px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700" %>
-                            </div>
-                            
-                            <div>
-                              <button type="button" class="px-3 py-1 text-xs bg-gray-200 text-gray-800 rounded mr-2 select-all-btn">Select All</button>
-                              <button type="button" class="px-3 py-1 text-xs bg-gray-200 text-gray-800 rounded clear-all-btn">Clear All</button>
-                            </div>
-                          </div>
-                          
-                          <div class="max-h-96 overflow-y-auto border rounded-lg">
-                            <table class="min-w-full divide-y divide-gray-200">
-                              <thead class="bg-gray-50 sticky top-0">
-                                <tr>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase w-10">
-                                    <input type="checkbox" class="select-all-check h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
-                                  </th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Backer</th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Pledge Details</th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Current Status</th>
-                                  <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">Last Updated</th>
-                                </tr>
-                              </thead>
-                              <tbody class="bg-white divide-y divide-gray-200">
-                                <% reward.pledges.each do |pledge| %>
-                                  <% fulfillment = BackerItemFulfillment.find_by(pledge: pledge, reward_item: item) %>
-                                  <tr>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                      <%= f.check_box "backer_ids[]", { class: "backer-checkbox h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded" }, pledge.id, nil %>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                      <div class="text-sm font-medium text-gray-900"><%= pledge.backer.name %></div>
-                                      <div class="text-xs text-gray-500"><%= pledge.backer.email %></div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                      <div class="text-sm text-gray-900"><%= number_to_currency(pledge.amount) %></div>
-                                      <div class="text-xs text-gray-500">Pledged on <%= pledge.created_at.strftime("%b %d, %Y") %></div>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap">
-                                      <% if fulfillment&.shipped %>
-                                        <span class="px-2 py-1 text-xs rounded-full bg-green-100 text-green-800">Shipped</span>
-                                      <% else %>
-                                        <span class="px-2 py-1 text-xs rounded-full bg-gray-100 text-gray-800">Not Shipped</span>
-                                      <% end %>
-                                    </td>
-                                    <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                                      <% if fulfillment&.updated_at %>
-                                        <%= fulfillment.updated_at.strftime("%b %d, %Y") %>
-                                      <% else %>
-                                        -
-                                      <% end %>
-                                    </td>
-                                  </tr>
-                                <% end %>
-                              </tbody>
-                            </table>
-                          </div>
-                        <% end %>
-                      </div>
-                    </div>
-                  <% end %>
-                </tbody>
-              </table>
-              
-              <div class="mt-4 flex justify-between items-center">
-                <div>
-                  <span class="text-sm font-medium">Fulfillable Backers:</span>
-                  <span class="ml-1 text-sm bg-indigo-100 text-indigo-800 px-2 py-1 rounded">
-                    <%= reward.fulfillable_backer_count %> of <%= reward.pledges.count %>
-                  </span>
-                </div>
-              </div>
-            </div>
-          <% else %>
-            <div class="text-center py-8 bg-gray-50 rounded-lg">
-              <p class="text-gray-500 mb-2">No items added yet</p>
-              <p class="text-sm text-gray-400">Add items to track production and shipping status</p>
-            </div>
-          <% end %>
-          
-          <!-- Add Item Modal -->
-          <div id="add-item-<%= reward.id %>" class="hidden fixed inset-0 bg-gray-500 bg-opacity-75 flex items-center justify-center z-50" data-modal-target="modal">
-            <div class="bg-white rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
-              <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium">Add New Item</h3>
-                <button data-action="modal#close" class="text-gray-400 hover:text-gray-500">
-                  <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                </button>
-              </div>
-              
-              <%= form_with url: "/projects/#{@project.id}/rewards/#{reward.id}/reward_items", method: :post do |f| %>
-                <div class="space-y-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Item Name</label>
-                    <%= f.text_field 'reward_item[name]', required: true, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
-                  </div>
-                  
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Description</label>
-                    <%= f.text_area 'reward_item[description]', rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
-                  </div>
-                  
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Quantity Per Reward</label>
-                    <%= f.number_field 'reward_item[quantity_per_reward]', value: 1, min: 1, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
-                    <p class="text-xs text-gray-500 mt-1">How many of this item each backer receives</p>
-                  </div>
-                  
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Produced Count</label>
-                    <%= f.number_field 'reward_item[produced_count]', value: 0, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
-                  </div>
-                  
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Shipped Count</label>
-                    <%= f.number_field 'reward_item[shipped_count]', value: 0, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-md" %>
-                  </div>
-                  
-                  <div class="flex justify-end">
-                    <button type="button" data-action="modal#close" class="px-4 py-2 text-sm text-gray-700 bg-gray-100 rounded-md mr-2 hover:bg-gray-200">
-                      Cancel
-                    </button>
-                    <%= f.submit "Add Item", class: "px-4 py-2 text-sm text-white bg-indigo-600 rounded-md hover:bg-indigo-700" %>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        </div>
-        
-        <!-- Slider for this reward -->
-        <%= render Ui::ProgressSliderComponent.new(reward: reward, project: @project) %>
       </div>
-    <% end %>
-  </div>
-</div>
-
-<script>
-  document.addEventListener('DOMContentLoaded', function() {
-    // Handle select all / clear all buttons in backer fulfillment modals
-    document.querySelectorAll('.select-all-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const checkboxes = this.closest('form').querySelectorAll('.backer-checkbox');
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = true;
-        });
-      });
-    });
-    
-    document.querySelectorAll('.clear-all-btn').forEach(btn => {
-      btn.addEventListener('click', function() {
-        const checkboxes = this.closest('form').querySelectorAll('.backer-checkbox');
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = false;
-        });
-      });
-    });
-    
-    document.querySelectorAll('.select-all-check').forEach(headerCheckbox => {
-      headerCheckbox.addEventListener('change', function() {
-        const isChecked = this.checked;
-        const table = this.closest('table');
-        const checkboxes = table.querySelectorAll('.backer-checkbox');
+      
+      <!-- Fulfillment Progress -->
+      <div class="mt-4 mb-6">
+        <div class="flex justify-between mb-1">
+          <span class="text-sm font-medium text-gray-500">Fulfillment Progress</span>
+          <span class="text-sm font-medium text-gray-500" data-slider-target="valueDisplay"><%= reward.fulfillment_progress || 0 %>%</span>
+        </div>
         
-        checkboxes.forEach(checkbox => {
-          checkbox.checked = isChecked;
-        });
-      });
-    });
-  });
-</script>
+        <!-- Progress Update Form -->
+        <div class="mt-3" data-controller="slider" data-slider-project-value="<%= @project.id %>" data-slider-reward-value="<%= reward.id %>">
+          <%= form_with url: "/projects/#{@project.id}/fulfillment_dashboard/update_reward", method: :patch, class: "flex items-center", data: { turbo: false } do |f| %>
+            <%= f.hidden_field :reward_id, value: reward.id %>
+            <div class="w-full mr-3 slider-container" data-slider-target="sliderContainer" style="--fill-percentage: <%= reward.fulfillment_progress || 0 %>%">
+              <%= f.range_field "reward[fulfillment_progress]",
+                               min: 0, max: 100, value: reward.fulfillment_progress || 0,
+                               class: "w-full",
+                               data: { slider_target: "input", action: "input->slider#updateProgress" } %>
+            </div>
+            <%= f.submit "Save Progress", class: "bg-indigo-600 text-white px-3 py-1 rounded text-sm hover:bg-indigo-700", data: { slider_target: "saveButton" } %>
+          <% end %>
+        </div>
+      </div>
+      
+      <!-- Item Tracking Section -->
+      <div class="mt-6 border-t pt-4">
+        <div class="flex justify-between items-center mb-4">
+          <h3 class="text-lg font-medium">Item Tracking</h3>
+          <button class="text-sm bg-indigo-600 text-white px-3 py-1.5 rounded hover:bg-indigo-700 flex items-center"
+                  data-action="click->modal#open" 
+                  data-modal-id="add-item-modal-<%= reward.id %>">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add Item
+          </button>
+        </div>
+        
+        <% if reward.reward_items.exists? %>
+          <div class="overflow-x-auto">
+            <table class="min-w-full">
+              <thead>
+                <tr class="bg-gray-50 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th class="px-4 py-2">Item</th>
+                  <th class="px-4 py-2 text-center">Needed</th>
+                  <th class="px-4 py-2 text-center">Produced</th>
+                  <th class="px-4 py-2 text-center">Shipped</th>
+                  <th class="px-4 py-2 text-center">Status</th>
+                  <th class="px-4 py-2 text-center">Fulfillment</th>
+                  <th class="px-4 py-2 text-right">Actions</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-gray-200">
+                <% reward.reward_items.each do |item| %>
+                  <tr>
+                    <td class="px-4 py-2">
+                      <div class="font-medium"><%= item.name %></div>
+                      <div class="text-xs text-gray-500">Per reward: <%= item.quantity_per_reward %></div>
+                    </td>
+                    <td class="px-4 py-2 text-center"><%= item.total_needed %></td>
+                    <td class="px-4 py-2 text-center">
+                      <div>
+                        <div class="text-xs"><%= item.production_percentage %>%</div>
+                        <div class="w-16 bg-gray-200 h-1.5 rounded-full mx-auto mt-1">
+                          <div class="bg-blue-500 h-1.5 rounded-full" style="width: <%= item.production_percentage %>%"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                      <div>
+                        <div class="text-xs"><%= item.shipping_percentage %>%</div>
+                        <div class="w-16 bg-gray-200 h-1.5 rounded-full mx-auto mt-1">
+                          <div class="bg-green-500 h-1.5 rounded-full" style="width: <%= item.shipping_percentage %>%"></div>
+                        </div>
+                      </div>
+                    </td>
+                    <td class="px-4 py-2 text-center">
+                      <span class="px-2 py-0.5 text-xs rounded-full <%= item.status_badge_class %>">
+                        <%= item.status_name %>
+                      </span>
+                    </td>
+                    <td class="px-4 py-2 text-center text-xs">
+                      <% fulfilled_backers = item.backer_item_fulfillments.where(shipped: true).count %>
+                      <% total_backers = reward.pledges.count %>
+                      <%= fulfilled_backers %>/<%= total_backers %> backers
+                    </td>
+                    <td class="px-4 py-2 text-right">
+                      <button data-action="click->modal#open" 
+                              data-modal-id="update-item-modal-<%= item.id %>"
+                              class="text-indigo-600 hover:text-indigo-900 text-sm">
+                        Edit
+                      </button>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+        <% else %>
+          <div class="text-center py-4 text-gray-500">
+            <p>No items have been added for this reward yet.</p>
+            <p class="text-sm mt-1">Add items to track production and shipping progress.</p>
+          </div>
+        <% end %>
+      </div>
+      
+      <!-- Modal Definitions -->
+      <!-- Modals for item management are handled via JavaScript -->
+    </div>
+  <% end %>
+</div>
