@@ -58,19 +58,8 @@ blocks:
           commands:
             - bundle exec rake assets:precompile
 
-  - name: "Deploy to Heroku"
-    task:
-      secrets:
-        - name: backerkit-clone-secrets
-      jobs:
-        - name: Deploy
-          commands:
-            - checkout
-            - sem-version ruby 3.3.1
-            - curl https://cli-assets.heroku.com/install.sh | sh
-            - ssh-keyscan -H heroku.com >> ~/.ssh/known_hosts
-            - git config --global user.name "Semaphore CI"
-            - git config --global user.email "ci@semaphore.com"
-            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/backerkit-clone.git $SEMAPHORE_GIT_BRANCH:main
-    conditions:
-      - branch == 'main'
+promotions:
+  - name: Deploy to Heroku
+    pipeline_file: deploy-heroku.yml
+    auto_promote:
+      when: branch = 'main' AND result = 'passed'

@@ -1,0 +1,21 @@
+version: v1.0
+name: Deploy to Heroku
+agent:
+  machine:
+    type: e1-standard-2
+    os_image: ubuntu2004
+blocks:
+  - name: Deploy
+    task:
+      secrets:
+        - name: backerkit-clone-secrets
+      jobs:
+        - name: Deploy to Heroku
+          commands:
+            - checkout
+            - sem-version ruby 3.3.1
+            - curl https://cli-assets.heroku.com/install.sh | sh
+            - ssh-keyscan -H heroku.com >> ~/.ssh/known_hosts
+            - git config --global user.name "Semaphore CI"
+            - git config --global user.email "ci@semaphore.com"
+            - git push https://heroku:$HEROKU_API_KEY@git.heroku.com/backerkit-clone.git $SEMAPHORE_GIT_BRANCH:main
