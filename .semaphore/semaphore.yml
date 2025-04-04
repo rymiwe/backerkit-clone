@@ -50,9 +50,9 @@ blocks:
         - name: RSpec Tests
           commands:
             - RAILS_ENV=test bundle exec rspec --format progress --format RspecJunitFormatter --out tmp/test-results/rspec/results.xml
-          artifacts:
-            - name: Test Results
-              path: tmp/test-results/
+          env_vars:
+            - name: SEMAPHORE_TEST_RESULTS_PATH
+              value: tmp/test-results/
 
   - name: "Asset Precompilation Check"
     task:
