@@ -85,13 +85,14 @@ RSpec.describe FulfillmentWave do
     let(:project) { create(:project) }
 
     it "creates a valid fulfillment wave" do
+      initial_count = described_class.count
       wave = build(:fulfillment_wave,
                    project: project,
                    name: "New Wave",
                    target_ship_date: Time.zone.today + 30.days,
                    status: 'planned')
       expect(wave.save).to be true
-      expect(described_class.count).to eq(1)
+      expect(described_class.count).to eq(initial_count + 1)
     end
 
     it "reads fulfillment wave attributes" do

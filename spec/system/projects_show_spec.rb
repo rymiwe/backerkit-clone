@@ -42,18 +42,26 @@ RSpec.describe "Project show page", type: :system do
   end
   
   context "when viewing related projects section" do
-    let!(:related_project) { create(:project, title: "Related Project", category: project.category) }
+    let(:unique_category) { "Unique#{Time.now.to_i}" } # Create a unique category
+    let!(:related_project) { create(:project, title: "Related Test Project", category: unique_category) }
     
     before do
-      # Make sure @related_projects is not empty by setting the same category
-      project.update(category: "Games")
-      related_project.update(category: "Games")
+      # Use a unique category to avoid conflicts with seed data
+      project.update!(category: unique_category)
+      
+      # Force reload the page after setting up the related project
       visit project_path(project)
     end
     
     scenario "displays related projects in the same category" do
-      expect(page).to have_content("More Games Projects")
-      expect(page).to have_content(related_project.title)
+      # Check section header with category name
+      expect(page).to have_content("More #{unique_category} Projects") 
+      
+      # Verify the related project appears somewhere on the page
+      expect(page).to have_content("Related Test Project")
+      
+      # Take a screenshot if the test fails to help debug
+      page.save_screenshot("tmp/related_projects_test.png") if ENV['CI']
     end
   end
   
