@@ -1,0 +1,37 @@
+<div id="<%= id %>" class="modal hidden" 
+     data-controller="modal" 
+     data-action="keydown.escape->modal#close click@window->modal#backgroundClick">
+  
+  <div class="modal__dialog <%= size_classes %> w-full mx-4 my-8" 
+       role="dialog" 
+       aria-modal="true" 
+       aria-labelledby="<%= title ? "modal-title-#{id}" : '' %>"
+       data-modal-target="dialog">
+    
+    <% if title %>
+      <div class="modal__header border-b border-gray-200">
+        <h3 id="modal-title-<%= id %>" class="modal__title text-lg font-medium text-gray-900"><%= title %></h3>
+        <% if close_button %>
+          <button type="button" 
+                  class="text-gray-400 hover:text-gray-500" 
+                  data-action="modal#close"
+                  aria-label="Close modal">
+            <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        <% end %>
+      </div>
+    <% end %>
+    
+    <div class="modal__body px-6 py-4">
+      <%= content %>
+    </div>
+    
+    <% if content_for?(:footer) %>
+      <div class="modal__footer bg-gray-50 rounded-b-lg border-t border-gray-200 flex justify-end space-x-2 px-6 py-4">
+        <%= content_for(:footer) %>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -43,6 +43,12 @@ The application is automatically deployed to Heroku when changes are pushed to t
 
 View the Semaphore configuration in the `.semaphore` directory to see how the pipeline is structured.
 
+## CI/CD & DevOps
+
+- Semaphore CI/CD for continuous integration and deployment
+- Heroku for cloud hosting and production deployment
+- Git for version control
+
 ## Demo Accounts
 
 All accounts use the password: `password`
@@ -90,10 +96,43 @@ All user accounts have made pledges to various projects. To see which projects a
   - Tailwind CSS for styling
   - Stimulus JS for interactivity
   - Hotwire for real-time updates
-- **CI/CD & DevOps**:
-  - Semaphore CI/CD for continuous integration and deployment
-  - Heroku for cloud hosting and production deployment
-  - Git for version control
+  - ViewComponent for reusable UI components
+
+## Component Library
+
+The application features a comprehensive UI component library built with ViewComponent and Stimulus.js. This modular architecture promotes consistency, reusability, and maintainability.
+
+Visit the [Component Library](/component-library) to explore all available components.
+
+### Key Components
+
+- **StatusBadgeComponent**: Display status indicators with consistent styling
+- **ProgressBarComponent**: Visualize completion percentages
+- **ProgressSliderComponent**: Interactive fulfillment progress controls
+- **ModalComponent**: Accessible dialog windows
+
+All components follow accessibility best practices and are responsive across different screen sizes.
+
+## Accessibility
+
+This application adheres to WCAG accessibility standards:
+
+- Semantic HTML structure
+- ARIA attributes on interactive elements
+- Keyboard navigation support
+- Sufficient color contrast
+- Focus management in modals and interactive components
+
+## Code Organization
+
+The application follows these architectural principles:
+
+- **Components**: Reusable UI components in `app/components`
+- **Controllers**: RESTful API endpoints and page controllers in `app/controllers`
+- **Models**: Domain logic and data models in `app/models`
+- **Views**: Page templates in `app/views`
+- **Assets**: CSS, JavaScript, and images in `app/assets`
+- **JavaScript**: Stimulus controllers in `app/javascript/controllers`
 
 ## Test Coverage
 

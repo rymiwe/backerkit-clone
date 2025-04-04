@@ -2,8 +2,8 @@
   <% if display_text? %>
     <span class="text-sm font-medium mr-2"><%= text_display %></span>
   <% end %>
-  <div class="flex-grow <%= background_class %> <%= height_class %> rounded-full overflow-hidden">
-    <div class="<%= height_class %> <%= color_class %> rounded-full" style="width: <%= percentage %>%"></div>
+  <div class="flex-grow progress-bar <%= background_class %>" role="progressbar" aria-valuenow="<%= percentage %>" aria-valuemin="0" aria-valuemax="100">
+    <div class="progress-bar__fill <%= color_class %> <%= height_class %>" style="width: <%= percentage %>%"></div>
   </div>
   <% if display_text? && display_text? != true %>
     <span class="ml-2 text-sm font-medium"><%= percentage %>%</span>

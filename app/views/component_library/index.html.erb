@@ -1,0 +1,369 @@
+<div class="container mx-auto px-4 py-8">
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold mb-2">BackerKit Component Library</h1>
+    <p class="text-gray-600">A showcase of the UI components used throughout the application.</p>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 id="status-badges" class="text-xl font-semibold mb-4">Status Badges</h2>
+    <p class="mb-4 text-gray-600">Used to display the status of items, rewards, and fulfillment waves.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <% @statuses.each do |status| %>
+        <div class="p-4 border rounded-lg">
+          <h3 class="text-sm font-medium text-gray-500 mb-2"><%= status.titleize %></h3>
+          <div class="flex justify-center">
+            <%= render(Ui::StatusBadgeComponent.new(status: status)) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <h3 class="text-lg font-medium mb-2">With Progress Indicators</h3>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+      <% @statuses.first(4).each_with_index do |status, index| %>
+        <div class="p-4 border rounded-lg">
+          <h3 class="text-sm font-medium text-gray-500 mb-2"><%= status.titleize %> with <%= @progress_values[index] %>% progress</h3>
+          <div class="flex justify-center">
+            <%= render(Ui::StatusBadgeComponent.new(status: status, progress: @progress_values[index])) %>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 id="progress-bars" class="text-xl font-semibold mb-4">Progress Bars</h2>
+    <p class="mb-4 text-gray-600">Used to visualize completion percentage for various tasks.</p>
+
+    <div class="space-y-8">
+      <% @progress_values.each do |value| %>
+        <div>
+          <h3 class="text-sm font-medium text-gray-500 mb-2"><%= value %>% Complete</h3>
+          <%= render(Ui::ProgressBarComponent.new(percentage: value)) %>
+        </div>
+      <% end %>
+
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">With Text Display</h3>
+        <%= render(Ui::ProgressBarComponent.new(
+          percentage: 65,
+          text_display: "65%"
+        )) %>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">Different Height</h3>
+        <%= render(Ui::ProgressBarComponent.new(
+          percentage: 80,
+          height: 4
+        )) %>
+      </div>
+
+      <div>
+        <h3 class="text-sm font-medium text-gray-500 mb-2">Different Color</h3>
+        <%= render(Ui::ProgressBarComponent.new(
+          percentage: 50,
+          color: "purple-600"
+        )) %>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 id="progress-sliders" class="text-xl font-semibold mb-4">Progress Sliders</h2>
+    <p class="mb-4 text-gray-600">Interactive sliders used for updating progress.</p>
+    
+    <div class="p-4 border rounded-lg">
+      <h3 class="text-sm font-medium text-gray-500 mb-2">Basic Slider Example</h3>
+      <div class="slider-container">
+        <input type="range" min="0" max="100" value="60" class="w-full" style="--fill-percentage: 60%">
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 id="modals" class="text-xl font-semibold mb-4">Modals</h2>
+    <p class="mb-4 text-gray-600">Dialog windows for focused interactions.</p>
+    
+    <div class="flex flex-wrap gap-4">
+      <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              data-action="click->modal#open"
+              data-modal-id="demo-modal-sm">
+        Small Modal
+      </button>
+      
+      <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              data-action="click->modal#open"
+              data-modal-id="demo-modal-md">
+        Medium Modal
+      </button>
+      
+      <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700"
+              data-action="click->modal#open"
+              data-modal-id="demo-modal-lg">
+        Large Modal
+      </button>
+    </div>
+    
+    <%= render(Ui::ModalComponent.new(id: "demo-modal-sm", title: "Small Modal", size: :sm)) do %>
+      <p>This is a small modal dialog for simple notifications or quick actions.</p>
+      <% content_for :footer do %>
+        <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                data-action="modal#close">
+          Close
+        </button>
+        <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+          Confirm
+        </button>
+      <% end %>
+    <% end %>
+    
+    <%= render(Ui::ModalComponent.new(id: "demo-modal-md", title: "Medium Modal", size: :md)) do %>
+      <p class="mb-4">This is a medium-sized modal dialog, suitable for forms and more detailed content.</p>
+      <div class="mb-4">
+        <label class="block text-gray-700 text-sm font-bold mb-2" for="username">
+          Username
+        </label>
+        <input class="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" id="username" type="text" placeholder="Username">
+      </div>
+      <% content_for :footer do %>
+        <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                data-action="modal#close">
+          Cancel
+        </button>
+        <button class="px-4 py-2 bg-indigo-600 text-white rounded-md hover:bg-indigo-700">
+          Save Changes
+        </button>
+      <% end %>
+    <% end %>
+    
+    <%= render(Ui::ModalComponent.new(id: "demo-modal-lg", title: "Large Modal", size: :lg)) do %>
+      <div class="prose">
+        <p>This is a large modal dialog, suitable for displaying detailed information or complex forms.</p>
+        <h3>Features</h3>
+        <ul>
+          <li>Responsive sizing</li>
+          <li>Keyboard accessibility (ESC to close)</li>
+          <li>Click outside to dismiss</li>
+          <li>Focus management</li>
+          <li>ARIA attributes for screen readers</li>
+        </ul>
+      </div>
+      <% content_for :footer do %>
+        <button class="px-4 py-2 bg-gray-200 text-gray-800 rounded-md hover:bg-gray-300"
+                data-action="modal#close">
+          Close
+        </button>
+      <% end %>
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 id="tables" class="text-xl font-semibold mb-4">Tables</h2>
+    <p class="mb-4 text-gray-600">Structured data presentation with responsive design.</p>
+    
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Item</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progress</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @sample_items.each do |item| %>
+            <tr>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm font-medium text-gray-900"><%= item[:name] %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-gray-500"><%= item[:quantity] %></div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <%= render(Ui::StatusBadgeComponent.new(status: item[:status])) %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <%= render(Ui::ProgressBarComponent.new(percentage: item[:progress], height: 1.5)) %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 id="empty-states" class="text-xl font-semibold mb-4">Empty States</h2>
+    <p class="mb-4 text-gray-600">Friendly and helpful messaging when there's no data to display.</p>
+    
+    <div class="border rounded-lg p-8">
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 13h6m-3-3v6m-9 1V7a2 2 0 012-2h6l2 2h6a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2z" />
+        </svg>
+        <h3 class="mt-2 text-lg font-medium text-gray-900">No items found</h3>
+        <p class="mt-1 text-sm text-gray-500">Get started by creating your first item.</p>
+        <div class="mt-6">
+          <button type="button" class="inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Item
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 id="form-elements" class="text-xl font-semibold mb-4">Form Elements</h2>
+    <p class="mb-4 text-gray-600">Input controls with proper labeling and error states.</p>
+    
+    <div class="space-y-8">
+      <!-- Text Input -->
+      <div>
+        <h3 class="text-lg font-medium mb-4">Text Input</h3>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" name="name" id="name" class="shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm border-gray-300 rounded-md" placeholder="John Doe">
+            <p class="mt-1 text-sm text-gray-500">Standard text input</p>
+          </div>
+          
+          <div>
+            <label for="name_error" class="block text-sm font-medium text-gray-700 mb-1">Name</label>
+            <input type="text" name="name_error" id="name_error" class="shadow-sm focus:ring-red-500 focus:border-red-500 block w-full sm:text-sm border-red-300 rounded-md" aria-invalid="true" aria-describedby="name-error">
+            <p class="mt-1 text-sm text-red-600" id="name-error">Name cannot be empty</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Select -->
+      <div>
+        <h3 class="text-lg font-medium mb-4">Select Input</h3>
+        <div class="max-w-md">
+          <label for="status" class="block text-sm font-medium text-gray-700 mb-1">Status</label>
+          <select id="status" name="status" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md">
+            <option value="not_started">Not Started</option>
+            <option value="in_progress">In Progress</option>
+            <option value="completed">Completed</option>
+          </select>
+        </div>
+      </div>
+      
+      <!-- Checkbox -->
+      <div>
+        <h3 class="text-lg font-medium mb-4">Checkbox</h3>
+        <div class="flex items-center">
+          <input id="remember_me" name="remember_me" type="checkbox" class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+          <label for="remember_me" class="ml-2 block text-sm text-gray-900">Remember me</label>
+        </div>
+      </div>
+      
+      <!-- Radio Group -->
+      <div>
+        <h3 class="text-lg font-medium mb-4">Radio Group</h3>
+        <div class="space-y-4">
+          <div class="flex items-center">
+            <input id="shipping-standard" name="shipping" type="radio" checked class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+            <label for="shipping-standard" class="ml-3 block text-sm font-medium text-gray-700">Standard Shipping</label>
+          </div>
+          
+          <div class="flex items-center">
+            <input id="shipping-express" name="shipping" type="radio" class="focus:ring-indigo-500 h-4 w-4 text-indigo-600 border-gray-300">
+            <label for="shipping-express" class="ml-3 block text-sm font-medium text-gray-700">Express Shipping</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <h2 id="buttons" class="text-xl font-semibold mb-4">Buttons</h2>
+    <p class="mb-4 text-gray-600">Action triggers with various states and styles.</p>
+    
+    <div class="space-y-6">
+      <div>
+        <h3 class="text-lg font-medium mb-4">Button Sizes</h3>
+        <div class="flex flex-wrap gap-4 items-center">
+          <button type="button" class="px-2.5 py-1.5 text-xs rounded bg-indigo-600 text-white hover:bg-indigo-700">
+            Extra Small
+          </button>
+          <button type="button" class="px-3 py-2 text-sm rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
+            Small
+          </button>
+          <button type="button" class="px-4 py-2 text-base rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
+            Medium
+          </button>
+          <button type="button" class="px-6 py-3 text-base rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
+            Large
+          </button>
+        </div>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium mb-4">Button Styles</h3>
+        <div class="flex flex-wrap gap-4">
+          <button type="button" class="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
+            Primary
+          </button>
+          <button type="button" class="px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
+            Secondary
+          </button>
+          <button type="button" class="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700">
+            Danger
+          </button>
+          <button type="button" class="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700">
+            Success
+          </button>
+          <button type="button" class="px-4 py-2 text-indigo-600 hover:text-indigo-900 underline">
+            Link Style
+          </button>
+        </div>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium mb-4">Button with Icon</h3>
+        <div class="flex flex-wrap gap-4">
+          <button type="button" class="inline-flex items-center px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700">
+            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Add Item
+          </button>
+          
+          <button type="button" class="inline-flex items-center px-4 py-2 rounded-md bg-white border border-gray-300 text-gray-700 hover:bg-gray-50">
+            <svg class="-ml-1 mr-2 h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+            </svg>
+            Export
+          </button>
+        </div>
+      </div>
+      
+      <div>
+        <h3 class="text-lg font-medium mb-4">Button States</h3>
+        <div class="flex flex-wrap gap-4">
+          <button type="button" class="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            Focus Ring
+          </button>
+          
+          <button type="button" class="px-4 py-2 rounded-md bg-indigo-600 text-white opacity-50 cursor-not-allowed" disabled>
+            Disabled
+          </button>
+          
+          <button type="button" class="px-4 py-2 rounded-md bg-indigo-600 text-white hover:bg-indigo-700 inline-flex items-center">
+            <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Loading
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

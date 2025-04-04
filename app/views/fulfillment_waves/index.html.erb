@@ -22,11 +22,13 @@
     </div>
     
     <% if @fulfillment_waves.empty? %>
-      <div class="px-6 py-8 text-center">
-        <p class="text-gray-500">No fulfillment waves have been created yet.</p>
-        <p class="text-sm text-gray-400 mt-2">Create your first fulfillment wave to start organizing items for production and shipment.</p>
-        <p class="text-sm text-gray-400 mt-2">We recommend creating separate waves for items with different production timelines or shipping requirements.</p>
-      </div>
+      <%= render(Ui::EmptyStateComponent.new(
+        title: "No fulfillment waves have been created yet",
+        description: "Create your first fulfillment wave to start organizing items for production and shipment. We recommend creating separate waves for items with different production timelines or shipping requirements.",
+        action_text: "Create New Wave",
+        action_path: "/projects/#{@project.id}/fulfillment_waves/new",
+        icon: :box
+      )) %>
     <% else %>
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">

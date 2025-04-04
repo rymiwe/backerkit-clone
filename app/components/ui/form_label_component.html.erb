@@ -1,0 +1,7 @@
+<label for="<%= input_id %>" class="<%= label_classes %>">
+  <%= label_text %>
+  <% if required %>
+    <span class="text-red-500 ml-1" aria-hidden="true">*</span>
+    <span class="sr-only">(required)</span>
+  <% end %>
+</label>
