@@ -12,9 +12,6 @@ AllCops:
     - 'node_modules/**/*'
     # Enable app directory checking for better code quality
 
-# Inherit from todo list while we're fixing issues
-inherit_from: .rubocop_todo.yml
-
 Style/Documentation:
   Enabled: false
 

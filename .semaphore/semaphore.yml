@@ -14,8 +14,7 @@ blocks:
             - checkout
             - sem-version ruby 3.3.1
             - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
-            - bundle config set --local path 'vendor/bundle'
-            - bundle install
+            - bundle install --path vendor/bundle
             - cache store gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock) vendor/bundle
 
   - name: "Code Quality"
@@ -25,8 +24,7 @@ blocks:
           - checkout
           - sem-version ruby 3.3.1
           - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
-          - bundle config set --local path 'vendor/bundle'
-          - bundle install
+          - bundle install --path vendor/bundle
       jobs:
         - name: Rubocop
           commands:
@@ -39,8 +37,7 @@ blocks:
           - checkout
           - sem-version ruby 3.3.1
           - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
-          - bundle config set --local path 'vendor/bundle'
-          - bundle install
+          - bundle install --path vendor/bundle
           - sem-service start postgres
           - cp config/database.semaphore.yml config/database.yml
           - RAILS_ENV=test bundle exec rake db:create db:schema:load
@@ -57,8 +54,7 @@ blocks:
           - checkout
           - sem-version ruby 3.3.1
           - cache restore gems-$SEMAPHORE_GIT_BRANCH-$(checksum Gemfile.lock),gems-$SEMAPHORE_GIT_BRANCH,gems-main
-          - bundle config set --local path 'vendor/bundle'
-          - bundle install
+          - bundle install --path vendor/bundle
       jobs:
         - name: Assets Precompile
           commands:
