@@ -28,8 +28,12 @@ module Fulfillment
 
     attr_reader :wave, :user, :project, :reward_items
 
+    # Check if the user is authorized to mark the wave as shipped
+    # Valid if either:
+    # 1. User is the project creator (both by association and role)
+    # 2. User has admin role
     def valid?
-      user == project.creator || user.has_role?('admin')
+      (user == project.creator && user.is_creator?) || user.has_role?('admin')
     end
 
     def update_wave_status
