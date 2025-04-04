@@ -4,6 +4,9 @@
 # This helps maintain data integrity in the fulfillment process
 class ShippingCountValidator < ActiveModel::Validator
   def validate(record)
+    # Skip validation during seed process if environment variable is set
+    return if ENV['SKIP_SHIPPING_VALIDATION'] == 'true'
+    
     # Skip validation if the record is new or these attributes aren't present
     return unless record.persisted? && record.respond_to?(:shipped_count) && record.respond_to?(:produced_count)
 

@@ -8,6 +8,10 @@ Reward.destroy_all
 Project.destroy_all
 User.destroy_all
 
+# Temporarily disable shipping validation during seed process
+ENV['SKIP_SHIPPING_VALIDATION'] = 'true'
+puts "Shipping validation disabled for seeding"
+
 puts "Creating users..."
 # Create admin user
 admin = User.create!(
