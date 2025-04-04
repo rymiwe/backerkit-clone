@@ -1,8 +1,21 @@
-test:
+default: &default
   adapter: postgresql
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-  database: backerkit_clone_test
   username: postgres
   password: 
   host: localhost
+
+development:
+  <<: *default
+  database: backerkit_clone_development
+
+test:
+  <<: *default
+  database: backerkit_clone_test
+
+production:
+  <<: *default
+  database: backerkit_clone_production
+  username: backerkit_clone
+  password: <%= ENV['BACKERKIT_CLONE_DATABASE_PASSWORD'] %>

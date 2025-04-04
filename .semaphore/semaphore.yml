@@ -41,11 +41,11 @@ blocks:
           - bundle install --path vendor/bundle
           - sem-service start postgres
           - cp config/database.semaphore.yml config/database.yml
-          - bundle exec rake db:setup
+          - RAILS_ENV=test bundle exec rake db:create db:schema:load
       jobs:
         - name: RSpec Tests
           commands:
-            - bundle exec rspec
+            - RAILS_ENV=test bundle exec rspec
 
   - name: "Asset Precompilation Check"
     task:
